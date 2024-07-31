@@ -37,11 +37,10 @@ service AdManagementService {
 
 // Campaign messages
 message CreateCampaignRequest {
-    string user_id = 1;
-    string name = 2;
-    int32 budget = 3;
-    string start_date = 4;
-    string end_date = 5;
+    string name = 1;
+    int32 budget = 2;
+    string start_date = 3;
+    string end_date = 4;
 }
 
 message CreateCampaignResponse {
