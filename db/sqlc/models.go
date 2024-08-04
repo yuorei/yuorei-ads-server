@@ -54,6 +54,26 @@ type Impression struct {
 	DeletedAt    sql.NullTime
 }
 
+type Organization struct {
+	OrganizationID      string
+	OrganizationName    string
+	RepresentativeName  string
+	RepresentativeEmail string
+	Purpose             string
+	Category            string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	DeletedAt           sql.NullTime
+}
+
+type OrganizationsUser struct {
+	OrganizationID string
+	UserID         string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      sql.NullTime
+}
+
 type Role struct {
 	RoleID      string
 	Name        string
