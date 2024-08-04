@@ -68,6 +68,31 @@ CREATE TABLE `impressions` (
  INDEX `ad_id` (`ad_id`),
  CONSTRAINT `impressions_ibfk_1` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`ad_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- Create "organizations" table
+CREATE TABLE `organizations` (
+ `organization_id` varchar(255) NOT NULL,
+ `organization_name` varchar(255) NOT NULL,
+ `representative_name` varchar(255) NOT NULL,
+ `representative_email` varchar(255) NOT NULL,
+ `purpose` varchar(255) NOT NULL,
+ `category` varchar(255) NOT NULL,
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ `deleted_at` timestamp NULL,
+ PRIMARY KEY (`organization_id`)
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- Create "organizations_users" table
+CREATE TABLE `organizations_users` (
+ `organization_id` varchar(255) NOT NULL,
+ `user_id` varchar(255) NOT NULL,
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ `deleted_at` timestamp NULL,
+ PRIMARY KEY (`organization_id`, `user_id`),
+ INDEX `fk_user_id` (`user_id`),
+ CONSTRAINT `fk_organization_id` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`organization_id`) ON UPDATE NO ACTION ON DELETE CASCADE,
+ CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE NO ACTION ON DELETE CASCADE
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "targeting" table
 CREATE TABLE `targeting` (
  `targeting_id` varchar(255) NOT NULL,

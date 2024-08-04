@@ -202,6 +202,95 @@ table "impressions" {
     columns = [column.ad_id]
   }
 }
+table "organizations" {
+  schema = schema.ads
+  column "organization_id" {
+    null = false
+    type = varchar(255)
+  }
+  column "organization_name" {
+    null = false
+    type = varchar(255)
+  }
+  column "representative_name" {
+    null = false
+    type = varchar(255)
+  }
+  column "representative_email" {
+    null = false
+    type = varchar(255)
+  }
+  column "purpose" {
+    null = false
+    type = varchar(255)
+  }
+  column "category" {
+    null = false
+    type = varchar(255)
+  }
+  column "created_at" {
+    null    = false
+    type    = timestamp
+    default = sql("CURRENT_TIMESTAMP")
+  }
+  column "updated_at" {
+    null      = false
+    type      = timestamp
+    default   = sql("CURRENT_TIMESTAMP")
+    on_update = sql("CURRENT_TIMESTAMP")
+  }
+  column "deleted_at" {
+    null = true
+    type = timestamp
+  }
+  primary_key {
+    columns = [column.organization_id]
+  }
+}
+table "organizations_users" {
+  schema = schema.ads
+  column "organization_id" {
+    null = false
+    type = varchar(255)
+  }
+  column "user_id" {
+    null = false
+    type = varchar(255)
+  }
+  column "created_at" {
+    null    = false
+    type    = timestamp
+    default = sql("CURRENT_TIMESTAMP")
+  }
+  column "updated_at" {
+    null      = false
+    type      = timestamp
+    default   = sql("CURRENT_TIMESTAMP")
+    on_update = sql("CURRENT_TIMESTAMP")
+  }
+  column "deleted_at" {
+    null = true
+    type = timestamp
+  }
+  primary_key {
+    columns = [column.organization_id, column.user_id]
+  }
+  foreign_key "fk_organization_id" {
+    columns     = [column.organization_id]
+    ref_columns = [table.organizations.column.organization_id]
+    on_update   = NO_ACTION
+    on_delete   = CASCADE
+  }
+  foreign_key "fk_user_id" {
+    columns     = [column.user_id]
+    ref_columns = [table.users.column.user_id]
+    on_update   = NO_ACTION
+    on_delete   = CASCADE
+  }
+  index "fk_user_id" {
+    columns = [column.user_id]
+  }
+}
 table "roles" {
   schema = schema.ads
   column "role_id" {
