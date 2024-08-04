@@ -10,13 +10,14 @@ import (
 )
 
 type Ad struct {
-	AdID      string
-	AdGroupID string
-	Type      string
-	Content   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt sql.NullTime
+	AdID       string
+	AdGroupID  string
+	Type       string
+	Content    string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  sql.NullTime
+	IsApproval sql.NullBool
 }
 
 type AdGroup struct {
@@ -26,6 +27,7 @@ type AdGroup struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  sql.NullTime
+	IsApproval sql.NullBool
 }
 
 type Campaign struct {
@@ -38,6 +40,7 @@ type Campaign struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  sql.NullTime
+	IsApproval sql.NullBool
 }
 
 type Impression struct {
