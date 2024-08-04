@@ -6,15 +6,18 @@ import (
 )
 
 type UseCase struct {
+	port.OrganizationInputPort
 	port.UserInputPort
 	port.AdsInputPort
 }
 
 func NewUseCase(infra *infrastructure.Infrastructure) *UseCase {
+	organization := NewOrganizationUseCase(infra)
 	user := NewUserUseCase(infra)
 	ads := NewAdsUseCase(infra)
 	return &UseCase{
-		UserInputPort: user,
-		AdsInputPort:  ads,
+		OrganizationInputPort: organization,
+		UserInputPort:         user,
+		AdsInputPort:          ads,
 	}
 }
