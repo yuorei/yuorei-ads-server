@@ -25,10 +25,11 @@ func NewAdsServer(infra *infrastructure.Infrastructure) *AdsServer {
 
 func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[adsv1.CreateCampaignRequest]) (*connect.Response[adsv1.CreateCampaignResponse], error) {
 	// TODO: 認証後のユーザIDを取得
+	userID := "1"
 	// TODO:変換	req.Msg.StartDate, req.Msg.EndDate を time.Time に変換して代入する
 	startDate := time.Now()
 	endDate := time.Now()
-	campaign := domain.NewCampaign("", req.Msg.UserId, req.Msg.Name, int(req.Msg.Budget), startDate, endDate, false,time.Now(),time.Now(),nil)
+	campaign := domain.NewCampaign("id", userID, req.Msg.Name, int(req.Msg.Budget), startDate, endDate, false, time.Now(), time.Now(), nil)
 	result, err := s.usecase.CreateCampaign(ctx, campaign)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create campaign: %w", err)
