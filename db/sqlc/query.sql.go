@@ -228,7 +228,7 @@ func (q *Queries) DeleteUserRole(ctx context.Context, arg DeleteUserRoleParams) 
 }
 
 const getAdById = `-- name: GetAdById :one
-SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at FROM ads WHERE ad_id = ? LIMIT 1
+SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at, is_approval FROM ads WHERE ad_id = ? LIMIT 1
 `
 
 func (q *Queries) GetAdById(ctx context.Context, adID string) (Ad, error) {
@@ -242,12 +242,13 @@ func (q *Queries) GetAdById(ctx context.Context, adID string) (Ad, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsApproval,
 	)
 	return i, err
 }
 
 const getAdGroupById = `-- name: GetAdGroupById :one
-SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at FROM ad_groups WHERE ad_group_id = ? LIMIT 1
+SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at, is_approval FROM ad_groups WHERE ad_group_id = ? LIMIT 1
 `
 
 func (q *Queries) GetAdGroupById(ctx context.Context, adGroupID string) (AdGroup, error) {
@@ -260,12 +261,13 @@ func (q *Queries) GetAdGroupById(ctx context.Context, adGroupID string) (AdGroup
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsApproval,
 	)
 	return i, err
 }
 
 const getAdGroupsByCampaignId = `-- name: GetAdGroupsByCampaignId :many
-SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at FROM ad_groups WHERE campaign_id = ?
+SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at, is_approval FROM ad_groups WHERE campaign_id = ?
 `
 
 func (q *Queries) GetAdGroupsByCampaignId(ctx context.Context, campaignID string) ([]AdGroup, error) {
@@ -284,6 +286,7 @@ func (q *Queries) GetAdGroupsByCampaignId(ctx context.Context, campaignID string
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.IsApproval,
 		); err != nil {
 			return nil, err
 		}
@@ -299,7 +302,7 @@ func (q *Queries) GetAdGroupsByCampaignId(ctx context.Context, campaignID string
 }
 
 const getAdsByAdGroupId = `-- name: GetAdsByAdGroupId :many
-SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at FROM ads WHERE ad_group_id = ?
+SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at, is_approval FROM ads WHERE ad_group_id = ?
 `
 
 func (q *Queries) GetAdsByAdGroupId(ctx context.Context, adGroupID string) ([]Ad, error) {
@@ -319,6 +322,7 @@ func (q *Queries) GetAdsByAdGroupId(ctx context.Context, adGroupID string) ([]Ad
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.IsApproval,
 		); err != nil {
 			return nil, err
 		}
@@ -334,7 +338,7 @@ func (q *Queries) GetAdsByAdGroupId(ctx context.Context, adGroupID string) ([]Ad
 }
 
 const getCampaignById = `-- name: GetCampaignById :one
-SELECT campaign_id, user_id, name, budget, start_date, end_date, created_at, updated_at, deleted_at FROM campaigns WHERE campaign_id = ? LIMIT 1
+SELECT campaign_id, user_id, name, budget, start_date, end_date, created_at, updated_at, deleted_at, is_approval FROM campaigns WHERE campaign_id = ? LIMIT 1
 `
 
 func (q *Queries) GetCampaignById(ctx context.Context, campaignID string) (Campaign, error) {
@@ -350,12 +354,13 @@ func (q *Queries) GetCampaignById(ctx context.Context, campaignID string) (Campa
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.IsApproval,
 	)
 	return i, err
 }
 
 const getCampaignsByUserId = `-- name: GetCampaignsByUserId :many
-SELECT campaign_id, user_id, name, budget, start_date, end_date, created_at, updated_at, deleted_at FROM campaigns WHERE user_id = ?
+SELECT campaign_id, user_id, name, budget, start_date, end_date, created_at, updated_at, deleted_at, is_approval FROM campaigns WHERE user_id = ?
 `
 
 func (q *Queries) GetCampaignsByUserId(ctx context.Context, userID string) ([]Campaign, error) {
@@ -377,6 +382,7 @@ func (q *Queries) GetCampaignsByUserId(ctx context.Context, userID string) ([]Ca
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.IsApproval,
 		); err != nil {
 			return nil, err
 		}
