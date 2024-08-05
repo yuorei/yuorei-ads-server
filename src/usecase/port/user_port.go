@@ -7,7 +7,7 @@ import (
 )
 
 type UserInputPort interface {
-	CreateUser(context.Context, *domain.User) (*domain.User, error)
+	CreateUser(context.Context, string, string) (*domain.User, error)
 }
 
 type UserRepository interface {

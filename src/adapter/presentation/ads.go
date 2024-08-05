@@ -8,7 +8,6 @@ import (
 	"connectrpc.com/connect"
 
 	adsv1 "github.com/yuorei/yuorei-ads/gen/rpc/ads/v1"
-	"github.com/yuorei/yuorei-ads/src/adapter/infrastructure"
 	"github.com/yuorei/yuorei-ads/src/domain"
 	"github.com/yuorei/yuorei-ads/src/usecase"
 )
@@ -17,9 +16,9 @@ type AdsServer struct {
 	usecase *usecase.UseCase
 }
 
-func NewAdsServer(infra *infrastructure.Infrastructure) *AdsServer {
+func NewAdsServer(repository *usecase.Repository) *AdsServer {
 	return &AdsServer{
-		usecase: usecase.NewUseCase(infra),
+		usecase: usecase.NewUseCase(repository),
 	}
 }
 

@@ -11,13 +11,27 @@ type UseCase struct {
 	port.AdsInputPort
 }
 
-func NewUseCase(infra *infrastructure.Infrastructure) *UseCase {
-	organization := NewOrganizationUseCase(infra)
-	user := NewUserUseCase(infra)
-	ads := NewAdsUseCase(infra)
+type Repository struct {
+	organizationRepository *OrganizationUseCase
+	userRepository         *UserUseCase
+	adsRepository          *AdsUseCase
+}
+
+func NewUseCase(repository *Repository) *UseCase {
 	return &UseCase{
-		OrganizationInputPort: organization,
-		UserInputPort:         user,
-		AdsInputPort:          ads,
+		OrganizationInputPort: repository,
+		UserInputPort:         repository,
+		AdsInputPort:          repository,
+	}
+}
+
+func NewRepository(infra *infrastructure.Infrastructure) *Repository {
+	organization := NewOrganizationRepository(infra)
+	user := NewUserRepository(infra)
+	ads := NewAdsRepository(infra)
+	return &Repository{
+		organizationRepository: organization,
+		userRepository:         user,
+		adsRepository:          ads,
 	}
 }

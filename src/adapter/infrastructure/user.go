@@ -10,12 +10,9 @@ import (
 func (i *Infrastructure) DBCreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	_, err := i.db.Database.CreateUser(ctx,
 		sqlc.CreateUserParams{
-			UserID:         user.ID,
-			Username:       user.Username,
-			HashedPassword: user.Password,
-			Email:          user.Email,
-		},
-	)
+			UserID: user.ID,
+			Role:   user.Role,
+		})
 	if err != nil {
 		return nil, err
 	}

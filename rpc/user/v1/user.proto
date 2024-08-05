@@ -20,10 +20,7 @@ service UserService {
 
 // User messages
 message CreateUserRequest {
-    string username = 1;
-    string email = 2;
-    string password = 3;
-    repeated string roles = 4;
+    string role = 1;
 }
 
 message CreateUserResponse {
@@ -39,11 +36,7 @@ message GetUserResponse {
 }
 
 message UpdateUserRequest {
-    string user_id = 1;
-    string username = 2;
-    string email = 3;
-    string password = 4;
-    repeated string roles = 5;
+    string role = 1;
 }
 
 message UpdateUserResponse {
@@ -60,29 +53,8 @@ message DeleteUserResponse {
 
 message User {
     string user_id = 1;
-    string username = 2;
-    string email = 3;
-    string hashed_password = 4;
     google.protobuf.Timestamp created_at = 5;
     google.protobuf.Timestamp updated_at = 6;
     google.protobuf.Timestamp deleted_at = 7;
-    repeated string roles = 8;
-}
-
-message AssignRoleRequest {
-    string user_id = 1;
-    string role_id = 2;
-}
-
-message AssignRoleResponse {
-    bool success = 1;
-}
-
-message RemoveRoleRequest {
-    string user_id = 1;
-    string role_id = 2;
-}
-
-message RemoveRoleResponse {
-    bool success = 1;
+    string role = 8;
 }
