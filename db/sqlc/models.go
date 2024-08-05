@@ -55,15 +55,14 @@ type Impression struct {
 }
 
 type Organization struct {
-	OrganizationID      string
-	OrganizationName    string
-	RepresentativeName  string
-	RepresentativeEmail string
-	Purpose             string
-	Category            string
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
-	DeletedAt           sql.NullTime
+	OrganizationID       string
+	OrganizationName     string
+	RepresentativeUserID string
+	Purpose              string
+	Category             string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+	DeletedAt            sql.NullTime
 }
 
 type OrganizationsUser struct {
@@ -72,15 +71,6 @@ type OrganizationsUser struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      sql.NullTime
-}
-
-type Role struct {
-	RoleID      string
-	Name        string
-	Description sql.NullString
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   sql.NullTime
 }
 
 type Targeting struct {
@@ -94,18 +84,8 @@ type Targeting struct {
 }
 
 type User struct {
-	UserID         string
-	Username       string
-	Email          string
-	HashedPassword string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	DeletedAt      sql.NullTime
-}
-
-type UserRole struct {
 	UserID    string
-	RoleID    string
+	Role      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt sql.NullTime

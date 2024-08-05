@@ -1,15 +1,11 @@
 -- Create "users" table
 CREATE TABLE `users` (
  `user_id` varchar(255) NOT NULL,
- `username` varchar(255) NOT NULL,
- `email` varchar(255) NOT NULL,
- `hashed_password` char(60) NOT NULL,
+ `role` varchar(255) NOT NULL,
  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  `deleted_at` timestamp NULL,
- PRIMARY KEY (`user_id`),
- UNIQUE INDEX `email` (`email`),
- UNIQUE INDEX `username` (`username`)
+ PRIMARY KEY (`user_id`)
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "campaigns" table
 CREATE TABLE `campaigns` (
@@ -72,8 +68,7 @@ CREATE TABLE `impressions` (
 CREATE TABLE `organizations` (
  `organization_id` varchar(255) NOT NULL,
  `organization_name` varchar(255) NOT NULL,
- `representative_name` varchar(255) NOT NULL,
- `representative_email` varchar(255) NOT NULL,
+ `representative_user_id` varchar(255) NOT NULL,
  `purpose` varchar(255) NOT NULL,
  `category` varchar(255) NOT NULL,
  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -105,27 +100,4 @@ CREATE TABLE `targeting` (
  PRIMARY KEY (`targeting_id`),
  INDEX `ad_id` (`ad_id`),
  CONSTRAINT `targeting_ibfk_1` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`ad_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
-) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
--- Create "roles" table
-CREATE TABLE `roles` (
- `role_id` varchar(255) NOT NULL,
- `name` varchar(255) NOT NULL,
- `description` text NULL,
- `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `deleted_at` timestamp NULL,
- PRIMARY KEY (`role_id`),
- UNIQUE INDEX `name` (`name`)
-) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
--- Create "user_roles" table
-CREATE TABLE `user_roles` (
- `user_id` varchar(255) NOT NULL,
- `role_id` varchar(255) NOT NULL,
- `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `deleted_at` timestamp NULL,
- PRIMARY KEY (`user_id`, `role_id`),
- INDEX `role_id` (`role_id`),
- CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION,
- CONSTRAINT `user_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;

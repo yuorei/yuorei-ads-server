@@ -22,17 +22,17 @@ func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationI
 
 	_, err = i.db.Database.CreateOrganization(ctx,
 		sqlc.CreateOrganizationParams{
-			OrganizationID:      organization.ID,
-			OrganizationName:    organization.OrganizationName,
-			RepresentativeName:  organization.RepresentativeName,
-			RepresentativeEmail: organization.RepresentativeEmail,
-			Purpose:             organization.Purpose,
-			Category:            organization.Category,
+			OrganizationID:       organization.ID,
+			OrganizationName:     organization.OrganizationName,
+			RepresentativeUserID: organization.RepresentativeUserID,
+			Purpose:              organization.Purpose,
+			Category:             organization.Category,
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
+
 	return organization, nil
 }
 

@@ -91,20 +91,6 @@ func (q *Queries) CreateImpression(ctx context.Context, arg CreateImpressionPara
 	)
 }
 
-const createRole = `-- name: CreateRole :execresult
-INSERT INTO roles (role_id, name, description) VALUES (?, ?, ?)
-`
-
-type CreateRoleParams struct {
-	RoleID      string
-	Name        string
-	Description sql.NullString
-}
-
-func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createRole, arg.RoleID, arg.Name, arg.Description)
-}
-
 const createTargeting = `-- name: CreateTargeting :execresult
 INSERT INTO targeting (targeting_id, ad_id, type, value) VALUES (?, ?, ?, ?)
 `
@@ -126,36 +112,16 @@ func (q *Queries) CreateTargeting(ctx context.Context, arg CreateTargetingParams
 }
 
 const createUser = `-- name: CreateUser :execresult
-INSERT INTO users (user_id, username, email, hashed_password) VALUES (?, ?, ?, ?)
+INSERT INTO users (user_id,role) VALUES (?,?)
 `
 
 type CreateUserParams struct {
-	UserID         string
-	Username       string
-	Email          string
-	HashedPassword string
+	UserID string
+	Role   string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUser,
-		arg.UserID,
-		arg.Username,
-		arg.Email,
-		arg.HashedPassword,
-	)
-}
-
-const createUserRole = `-- name: CreateUserRole :execresult
-INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)
-`
-
-type CreateUserRoleParams struct {
-	UserID string
-	RoleID string
-}
-
-func (q *Queries) CreateUserRole(ctx context.Context, arg CreateUserRoleParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUserRole, arg.UserID, arg.RoleID)
+	return q.db.ExecContext(ctx, createUser, arg.UserID, arg.Role)
 }
 
 const deleteAd = `-- name: DeleteAd :execresult
@@ -190,14 +156,6 @@ func (q *Queries) DeleteImpression(ctx context.Context, impressionID string) (sq
 	return q.db.ExecContext(ctx, deleteImpression, impressionID)
 }
 
-const deleteRole = `-- name: DeleteRole :execresult
-UPDATE roles SET deleted_at = CURRENT_TIMESTAMP WHERE role_id = ?
-`
-
-func (q *Queries) DeleteRole(ctx context.Context, roleID string) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteRole, roleID)
-}
-
 const deleteTargeting = `-- name: DeleteTargeting :execresult
 UPDATE targeting SET deleted_at = CURRENT_TIMESTAMP WHERE targeting_id = ?
 `
@@ -212,19 +170,6 @@ UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?
 
 func (q *Queries) DeleteUser(ctx context.Context, userID string) (sql.Result, error) {
 	return q.db.ExecContext(ctx, deleteUser, userID)
-}
-
-const deleteUserRole = `-- name: DeleteUserRole :execresult
-DELETE FROM user_roles WHERE user_id = ? AND role_id = ?
-`
-
-type DeleteUserRoleParams struct {
-	UserID string
-	RoleID string
-}
-
-func (q *Queries) DeleteUserRole(ctx context.Context, arg DeleteUserRoleParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteUserRole, arg.UserID, arg.RoleID)
 }
 
 const getAdById = `-- name: GetAdById :one
@@ -453,42 +398,6 @@ func (q *Queries) GetImpressionsByAdId(ctx context.Context, adID string) ([]Impr
 	return items, nil
 }
 
-const getRoleById = `-- name: GetRoleById :one
-SELECT role_id, name, description, created_at, updated_at, deleted_at FROM roles WHERE role_id = ? LIMIT 1
-`
-
-func (q *Queries) GetRoleById(ctx context.Context, roleID string) (Role, error) {
-	row := q.db.QueryRowContext(ctx, getRoleById, roleID)
-	var i Role
-	err := row.Scan(
-		&i.RoleID,
-		&i.Name,
-		&i.Description,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
-}
-
-const getRoleByName = `-- name: GetRoleByName :one
-SELECT role_id, name, description, created_at, updated_at, deleted_at FROM roles WHERE name = ? LIMIT 1
-`
-
-func (q *Queries) GetRoleByName(ctx context.Context, name string) (Role, error) {
-	row := q.db.QueryRowContext(ctx, getRoleByName, name)
-	var i Role
-	err := row.Scan(
-		&i.RoleID,
-		&i.Name,
-		&i.Description,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
-}
-
 const getTargetingByAdId = `-- name: GetTargetingByAdId :many
 SELECT targeting_id, ad_id, type, value, created_at, updated_at, deleted_at FROM targeting WHERE ad_id = ?
 `
@@ -543,27 +452,8 @@ func (q *Queries) GetTargetingById(ctx context.Context, targetingID string) (Tar
 	return i, err
 }
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT user_id, username, email, hashed_password, created_at, updated_at, deleted_at FROM users WHERE email = ? LIMIT 1
-`
-
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
-	var i User
-	err := row.Scan(
-		&i.UserID,
-		&i.Username,
-		&i.Email,
-		&i.HashedPassword,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return i, err
-}
-
 const getUserById = `-- name: GetUserById :one
-SELECT user_id, username, email, hashed_password, created_at, updated_at, deleted_at FROM users WHERE user_id = ? LIMIT 1
+SELECT user_id, role, created_at, updated_at, deleted_at FROM users WHERE user_id = ? LIMIT 1
 `
 
 func (q *Queries) GetUserById(ctx context.Context, userID string) (User, error) {
@@ -571,47 +461,12 @@ func (q *Queries) GetUserById(ctx context.Context, userID string) (User, error) 
 	var i User
 	err := row.Scan(
 		&i.UserID,
-		&i.Username,
-		&i.Email,
-		&i.HashedPassword,
+		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
 	)
 	return i, err
-}
-
-const getUserRolesByUserId = `-- name: GetUserRolesByUserId :many
-SELECT user_id, role_id, created_at, updated_at, deleted_at FROM user_roles WHERE user_id = ?
-`
-
-func (q *Queries) GetUserRolesByUserId(ctx context.Context, userID string) ([]UserRole, error) {
-	rows, err := q.db.QueryContext(ctx, getUserRolesByUserId, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []UserRole
-	for rows.Next() {
-		var i UserRole
-		if err := rows.Scan(
-			&i.UserID,
-			&i.RoleID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const updateAd = `-- name: UpdateAd :execresult
@@ -677,20 +532,6 @@ func (q *Queries) UpdateImpression(ctx context.Context, arg UpdateImpressionPara
 	return q.db.ExecContext(ctx, updateImpression, arg.Impressions, arg.Clicks, arg.ImpressionID)
 }
 
-const updateRole = `-- name: UpdateRole :execresult
-UPDATE roles SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE role_id = ?
-`
-
-type UpdateRoleParams struct {
-	Name        string
-	Description sql.NullString
-	RoleID      string
-}
-
-func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateRole, arg.Name, arg.Description, arg.RoleID)
-}
-
 const updateTargeting = `-- name: UpdateTargeting :execresult
 UPDATE targeting SET type = ?, value = ?, updated_at = CURRENT_TIMESTAMP WHERE targeting_id = ?
 `
@@ -703,24 +544,4 @@ type UpdateTargetingParams struct {
 
 func (q *Queries) UpdateTargeting(ctx context.Context, arg UpdateTargetingParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, updateTargeting, arg.Type, arg.Value, arg.TargetingID)
-}
-
-const updateUser = `-- name: UpdateUser :execresult
-UPDATE users SET username = ?, email = ?, hashed_password = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?
-`
-
-type UpdateUserParams struct {
-	Username       string
-	Email          string
-	HashedPassword string
-	UserID         string
-}
-
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateUser,
-		arg.Username,
-		arg.Email,
-		arg.HashedPassword,
-		arg.UserID,
-	)
 }

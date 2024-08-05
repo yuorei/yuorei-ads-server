@@ -14,13 +14,12 @@ service OrganizationService {
 message Organization {
     string organization_id = 1;
     string organization_name = 2;
-    string representative_name = 3;
-    string representative_email = 4;
-    string purpose = 5;
-    string category = 6;
-    google.protobuf.Timestamp created_at = 7;
-    google.protobuf.Timestamp updated_at = 8;
-    google.protobuf.Timestamp deleted_at = 9;
+    string representative_user_id = 3;
+    string purpose = 4;
+    string category = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+    google.protobuf.Timestamp deleted_at = 8;
 }
 
 message CreateOrganizationRequest {
@@ -32,8 +31,7 @@ message CreateOrganizationRequest {
 message CreateTmpSaveOrganizationRequest {
     string organization_id = 1;
     string organization_name = 2;
-    string representative_name = 3;
-    string representative_email = 4;
+    string representative_uesr_id = 3;
     string purpose = 5;
     string category = 6;
     string client_id = 7;

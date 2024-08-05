@@ -1,14 +1,8 @@
 -- name: GetUserById :one
 SELECT * FROM users WHERE user_id = ? LIMIT 1;
 
--- name: GetUserByEmail :one
-SELECT * FROM users WHERE email = ? LIMIT 1;
-
 -- name: CreateUser :execresult
-INSERT INTO users (user_id, username, email, hashed_password) VALUES (?, ?, ?, ?);
-
--- name: UpdateUser :execresult
-UPDATE users SET username = ?, email = ?, hashed_password = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?;
+INSERT INTO users (user_id,role) VALUES (?,?);
 
 -- name: DeleteUser :execresult
 UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?;
@@ -87,27 +81,3 @@ UPDATE targeting SET type = ?, value = ?, updated_at = CURRENT_TIMESTAMP WHERE t
 
 -- name: DeleteTargeting :execresult
 UPDATE targeting SET deleted_at = CURRENT_TIMESTAMP WHERE targeting_id = ?;
-
--- name: GetRoleById :one
-SELECT * FROM roles WHERE role_id = ? LIMIT 1;
-
--- name: GetRoleByName :one
-SELECT * FROM roles WHERE name = ? LIMIT 1;
-
--- name: CreateRole :execresult
-INSERT INTO roles (role_id, name, description) VALUES (?, ?, ?);
-
--- name: UpdateRole :execresult
-UPDATE roles SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE role_id = ?;
-
--- name: DeleteRole :execresult
-UPDATE roles SET deleted_at = CURRENT_TIMESTAMP WHERE role_id = ?;
-
--- name: GetUserRolesByUserId :many
-SELECT * FROM user_roles WHERE user_id = ?;
-
--- name: CreateUserRole :execresult
-INSERT INTO user_roles (user_id, role_id) VALUES (?, ?);
-
--- name: DeleteUserRole :execresult
-DELETE FROM user_roles WHERE user_id = ? AND role_id = ?;

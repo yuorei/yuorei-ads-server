@@ -212,11 +212,7 @@ table "organizations" {
     null = false
     type = varchar(255)
   }
-  column "representative_name" {
-    null = false
-    type = varchar(255)
-  }
-  column "representative_email" {
+  column "representative_user_id" {
     null = false
     type = varchar(255)
   }
@@ -291,43 +287,6 @@ table "organizations_users" {
     columns = [column.user_id]
   }
 }
-table "roles" {
-  schema = schema.ads
-  column "role_id" {
-    null = false
-    type = varchar(255)
-  }
-  column "name" {
-    null = false
-    type = varchar(255)
-  }
-  column "description" {
-    null = true
-    type = text
-  }
-  column "created_at" {
-    null    = false
-    type    = timestamp
-    default = sql("CURRENT_TIMESTAMP")
-  }
-  column "updated_at" {
-    null      = false
-    type      = timestamp
-    default   = sql("CURRENT_TIMESTAMP")
-    on_update = sql("CURRENT_TIMESTAMP")
-  }
-  column "deleted_at" {
-    null = true
-    type = timestamp
-  }
-  primary_key {
-    columns = [column.role_id]
-  }
-  index "name" {
-    unique  = true
-    columns = [column.name]
-  }
-}
 table "targeting" {
   schema = schema.ads
   column "targeting_id" {
@@ -374,67 +333,15 @@ table "targeting" {
     columns = [column.ad_id]
   }
 }
-table "user_roles" {
-  schema = schema.ads
-  column "user_id" {
-    null = false
-    type = varchar(255)
-  }
-  column "role_id" {
-    null = false
-    type = varchar(255)
-  }
-  column "created_at" {
-    null    = false
-    type    = timestamp
-    default = sql("CURRENT_TIMESTAMP")
-  }
-  column "updated_at" {
-    null      = false
-    type      = timestamp
-    default   = sql("CURRENT_TIMESTAMP")
-    on_update = sql("CURRENT_TIMESTAMP")
-  }
-  column "deleted_at" {
-    null = true
-    type = timestamp
-  }
-  primary_key {
-    columns = [column.user_id, column.role_id]
-  }
-  foreign_key "user_roles_ibfk_1" {
-    columns     = [column.user_id]
-    ref_columns = [table.users.column.user_id]
-    on_update   = NO_ACTION
-    on_delete   = NO_ACTION
-  }
-  foreign_key "user_roles_ibfk_2" {
-    columns     = [column.role_id]
-    ref_columns = [table.roles.column.role_id]
-    on_update   = NO_ACTION
-    on_delete   = NO_ACTION
-  }
-  index "role_id" {
-    columns = [column.role_id]
-  }
-}
 table "users" {
   schema = schema.ads
   column "user_id" {
     null = false
     type = varchar(255)
   }
-  column "username" {
+  column "role" {
     null = false
     type = varchar(255)
-  }
-  column "email" {
-    null = false
-    type = varchar(255)
-  }
-  column "hashed_password" {
-    null = false
-    type = char(60)
   }
   column "created_at" {
     null    = false
@@ -453,14 +360,6 @@ table "users" {
   }
   primary_key {
     columns = [column.user_id]
-  }
-  index "email" {
-    unique  = true
-    columns = [column.email]
-  }
-  index "username" {
-    unique  = true
-    columns = [column.username]
   }
 }
 schema "ads" {
