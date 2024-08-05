@@ -12,15 +12,17 @@ import (
 	"github.com/yuorei/yuorei-ads/gen/rpc/user/v1/userv1connect"
 	"github.com/yuorei/yuorei-ads/src/adapter/infrastructure"
 	"github.com/yuorei/yuorei-ads/src/adapter/presentation"
+	"github.com/yuorei/yuorei-ads/src/usecase"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
 func NewRouter() {
 	infra := infrastructure.NewInfrastructure()
-	ads := presentation.NewAdsServer(infra)
-	user := presentation.NewUserServer(infra)
-	organization := presentation.NewOrganizationServer(infra)
+	repository := usecase.NewRepository(infra)
+	ads := presentation.NewAdsServer(repository)
+	user := presentation.NewUserServer(repository)
+	organization := presentation.NewOrganizationServer(repository)
 
 	mux := http.NewServeMux()
 	mux.Handle(adsv1connect.NewAdManagementServiceHandler(ads))                   // TODO: interfaceを実装していく

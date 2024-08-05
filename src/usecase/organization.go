@@ -11,14 +11,14 @@ type OrganizationUseCase struct {
 	organizationRepository port.OrganizationRepository
 }
 
-func NewOrganizationUseCase(organizationRepository port.OrganizationRepository) *OrganizationUseCase {
+func NewOrganizationRepository(organizationRepository port.OrganizationRepository) *OrganizationUseCase {
 	return &OrganizationUseCase{
 		organizationRepository: organizationRepository,
 	}
 }
 
-func (a *OrganizationUseCase) CreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret string) (*domain.Organization, error) {
-	result, err := a.organizationRepository.DBCreateOrganization(ctx, organizationID, clientID, ClientSecret)
+func (r *Repository) CreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret string) (*domain.Organization, error) {
+	result, err := r.organizationRepository.organizationRepository.DBCreateOrganization(ctx, organizationID, clientID, ClientSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (a *OrganizationUseCase) CreateOrganization(ctx context.Context, organizati
 	return result, nil
 }
 
-func (a *OrganizationUseCase) CreateTmpOrganization(ctx context.Context, organization *domain.Organization, clientID, ClientSecret string) (*domain.Organization, error) {
-	result, err := a.organizationRepository.TmpSaveRedisCreateOrganization(ctx, organization, clientID, ClientSecret)
+func (r *Repository) CreateTmpOrganization(ctx context.Context, organization *domain.Organization, clientID, ClientSecret string) (*domain.Organization, error) {
+	result, err := r.organizationRepository.organizationRepository.TmpSaveRedisCreateOrganization(ctx, organization, clientID, ClientSecret)
 	if err != nil {
 		return nil, err
 	}

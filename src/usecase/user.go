@@ -8,17 +8,21 @@ import (
 )
 
 type UserUseCase struct {
-	adsRepository port.UserRepository
+	userRepository port.UserRepository
 }
 
-func NewUserUseCase(adsRepository port.UserRepository) *UserUseCase {
+func NewUserRepository(repository port.UserRepository) *UserUseCase {
 	return &UserUseCase{
-		adsRepository: adsRepository,
+		userRepository: repository,
 	}
 }
 
-func (a *UserUseCase) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	result, err := a.adsRepository.DBCreateUser(ctx, user)
+func (r *Repository) CreateUser(ctx context.Context, userID, role string) (*domain.User, error) {
+	user := &domain.User{
+		ID:   userID,
+		Role: role,
+	}
+	result, err := r.userRepository.userRepository.DBCreateUser(ctx, user)
 	if err != nil {
 		return nil, err
 	}

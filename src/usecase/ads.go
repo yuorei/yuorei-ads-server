@@ -11,14 +11,14 @@ type AdsUseCase struct {
 	adsRepository port.AdsRepository
 }
 
-func NewAdsUseCase(adsRepository port.AdsRepository) *AdsUseCase {
+func NewAdsRepository(adsRepository port.AdsRepository) *AdsUseCase {
 	return &AdsUseCase{
 		adsRepository: adsRepository,
 	}
 }
 
-func (a *AdsUseCase) CreateCampaign(ctx context.Context, campaign *domain.Campaign) (*domain.Campaign, error) {
-	result, err := a.adsRepository.DBCreateCampaign(ctx, campaign)
+func (r *Repository) CreateCampaign(ctx context.Context, campaign *domain.Campaign) (*domain.Campaign, error) {
+	result, err := r.adsRepository.adsRepository.DBCreateCampaign(ctx, campaign)
 	if err != nil {
 		return nil, err
 	}
