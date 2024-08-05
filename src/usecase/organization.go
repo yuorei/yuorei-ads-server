@@ -23,6 +23,15 @@ func (r *Repository) CreateOrganization(ctx context.Context, organizationID, cli
 		return nil, err
 	}
 
+	user := &domain.User{
+		ID:   result.RepresentativeUserID,
+		Role: "admin",
+	}
+	_, err = r.userRepository.userRepository.DBCreateUser(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 
