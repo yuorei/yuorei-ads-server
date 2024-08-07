@@ -10,6 +10,7 @@ import (
 	"github.com/yuorei/yuorei-ads/gen/rpc/ads/v1/adsv1connect"
 	"github.com/yuorei/yuorei-ads/gen/rpc/organization/v1/organizationv1connect"
 	"github.com/yuorei/yuorei-ads/gen/rpc/user/v1/userv1connect"
+	"github.com/yuorei/yuorei-ads/middleware"
 	"github.com/yuorei/yuorei-ads/src/adapter/infrastructure"
 	"github.com/yuorei/yuorei-ads/src/adapter/presentation"
 	"github.com/yuorei/yuorei-ads/src/usecase"
@@ -24,6 +25,11 @@ func NewRouter() {
 	user := presentation.NewUserServer(repository)
 	organization := presentation.NewOrganizationServer(repository)
 
+	firebaseApp, err := middleware.NewFirebaseApp()
+	if err != nil {
+		log.Fatalf("error initializing Firebase app: %v", err)
+	}
+
 	mux := http.NewServeMux()
 	mux.Handle(adsv1connect.NewAdManagementServiceHandler(ads))                   // TODO: interfaceを実装していく
 	mux.Handle(userv1connect.NewUserServiceHandler(user))                         // TODO: interfaceを実装していく
@@ -34,9 +40,11 @@ func NewRouter() {
 	log.Fatalln(http.ListenAndServe(
 		host,
 		cors.AllowAll().Handler(
-			// Use h2c so we can serve HTTP/2 without TLS.
-			// HTTP1.1リクエストはHTTP/2にアップグレードされる
-			h2c.NewHandler(mux, &http2.Server{}),
+			firebaseApp.AuthMiddleware(
+				// Use h2c so we can serve HTTP/2 without TLS.
+				// HTTP1.1リクエストはHTTP/2にアップグレードされる
+				h2c.NewHandler(mux, &http2.Server{}),
+			),
 		),
 	))
 }
