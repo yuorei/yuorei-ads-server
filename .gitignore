@@ -1,3 +1,5 @@
 .env*
 /gen
 .DS_Store
+
+serviceAccountKey.json

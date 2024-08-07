@@ -9,7 +9,7 @@ import (
 	"github.com/yuorei/yuorei-ads/src/domain"
 )
 
-func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret string) (*domain.Organization, error) {
+func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret, userID string) (*domain.Organization, error) {
 	organization := &domain.Organization{}
 	hit, err := i.getFromRedis(ctx, clientID+"_"+ClientSecret, organization)
 	if err != nil {
@@ -20,6 +20,7 @@ func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationI
 		return nil, fmt.Errorf("organization not found")
 	}
 
+	organization.RepresentativeUserID = userID
 	_, err = i.db.Database.CreateOrganization(ctx,
 		sqlc.CreateOrganizationParams{
 			OrganizationID:       organization.ID,

@@ -17,8 +17,8 @@ func NewOrganizationRepository(organizationRepository port.OrganizationRepositor
 	}
 }
 
-func (r *Repository) CreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret string) (*domain.Organization, error) {
-	result, err := r.organizationRepository.organizationRepository.DBCreateOrganization(ctx, organizationID, clientID, ClientSecret)
+func (r *Repository) CreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret, userID string) (*domain.Organization, error) {
+	result, err := r.organizationRepository.organizationRepository.DBCreateOrganization(ctx, organizationID, clientID, ClientSecret, userID)
 	if err != nil {
 		return nil, err
 	}

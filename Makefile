@@ -40,12 +40,4 @@ gen_proto:
 
 prod:
 	set -a && source .env.prod && set +a&&\
-	PORT=$${PORT} \
-	IP=$${IP} \
-	REDIS_ADDRESS=$${REDIS_ADDRESS} \
-	MYSQL_HOST=$${MYSQL_HOST} \
-	MYSQL_PORT=$${MYSQL_PORT} \
-	MYSQL_DATABASE=$${MYSQL_DATABASE} \
-	MYSQL_PASSWORD=$${MYSQL_PASSWORD} \
-	MYSQL_USER=$${MYSQL_USER} \
 	go run cmd/server/main.go
