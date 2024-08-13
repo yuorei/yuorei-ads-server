@@ -20,7 +20,7 @@ service AdManagementService {
     // rpc DeleteAd(DeleteAdRequest) returns (DeleteAdResponse);
 
     // Ad Video
-    rpc CreateAdVideo(stream CreateAdVideoRequest) returns (CreateAdVideoResponse);
+    // rpc CreateAdVideo(stream CreateAdVideoRequest) returns (CreateAdVideoResponse);
     // rpc GetAdVideo(GetAdVideoRequest) returns (GetAdVideoResponse);
     // rpc UpdateAdVideo(UpdateAdVideoRequest) returns (UpdateAdVideoResponse);
     // rpc DeleteAdVideo(DeleteAdVideoRequest) returns (DeleteAdVideoResponse);
@@ -143,19 +143,6 @@ message Ad {
 }
 
 // Ad Video
-
-message CreateAdVideoRequest {
-    oneof value {
-        AdVideoMeta meta = 1;
-        bytes video = 2;
-    }
-}
-
-message CreateAdVideoResponse {
-    string ad_id = 1;
-    string ad_video_id = 2;
-}
-
 message GetAdVideoRequest {
     string ad_video_id = 1;
 }
