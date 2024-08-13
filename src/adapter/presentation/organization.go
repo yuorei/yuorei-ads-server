@@ -30,8 +30,6 @@ func (s *OrganizationServer) CreateOrganization(ctx context.Context, req *connec
 		return nil, fmt.Errorf("failed to create organization: organizationId and userID are the same")
 	}
 
-	fmt.Println("userIDだ", userID)
-
 	result, err := s.usecase.CreateOrganization(ctx, req.Msg.OrganizationId, req.Msg.ClientId, req.Msg.ClientSecret, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create organization: %w", err)
