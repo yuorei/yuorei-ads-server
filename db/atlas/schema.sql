@@ -23,32 +23,45 @@ CREATE TABLE `campaigns` (
  INDEX `user_id` (`user_id`),
  CONSTRAINT `campaigns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
--- Create "ad_groups" table
-CREATE TABLE `ad_groups` (
- `ad_group_id` varchar(255) NOT NULL,
- `campaign_id` varchar(255) NOT NULL,
- `name` varchar(255) NOT NULL,
- `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
- `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- `deleted_at` timestamp NULL,
- `is_approval` bool NULL,
- PRIMARY KEY (`ad_group_id`),
- INDEX `campaign_id` (`campaign_id`),
- CONSTRAINT `ad_groups_ibfk_1` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`campaign_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
-) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "ads" table
 CREATE TABLE `ads` (
  `ad_id` varchar(255) NOT NULL,
- `ad_group_id` varchar(255) NOT NULL,
- `type` varchar(255) NOT NULL,
- `content` text NOT NULL,
+ `campaign_id` varchar(255) NOT NULL,
+ `ad_type` varchar(255) NOT NULL,
  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  `deleted_at` timestamp NULL,
  `is_approval` bool NULL,
+ `is_open` bool NOT NULL,
+ `ad_link` varchar(255) NULL,
  PRIMARY KEY (`ad_id`),
- INDEX `ad_group_id` (`ad_group_id`),
- CONSTRAINT `ads_ibfk_1` FOREIGN KEY (`ad_group_id`) REFERENCES `ad_groups` (`ad_group_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
+ INDEX `campaign_id` (`campaign_id`),
+ CONSTRAINT `ads_ibfk_1` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`campaign_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- Create "ad_images" table
+CREATE TABLE `ad_images` (
+ `ad_id` varchar(255) NOT NULL,
+ `title` varchar(255) NOT NULL,
+ `description` text NOT NULL,
+ `image_url` varchar(255) NOT NULL,
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ `deleted_at` timestamp NULL,
+ INDEX `ad_id` (`ad_id`),
+ CONSTRAINT `ad_images_ibfk_1` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`ad_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
+) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+-- Create "ad_videos" table
+CREATE TABLE `ad_videos` (
+ `ad_id` varchar(255) NOT NULL,
+ `title` varchar(255) NOT NULL,
+ `description` text NOT NULL,
+ `thumbnail_url` varchar(255) NOT NULL,
+ `video_url` varchar(255) NOT NULL,
+ `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ `deleted_at` timestamp NULL,
+ INDEX `ad_id` (`ad_id`),
+ CONSTRAINT `ad_videos_ibfk_1` FOREIGN KEY (`ad_id`) REFERENCES `ads` (`ad_id`) ON UPDATE NO ACTION ON DELETE NO ACTION
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "impressions" table
 CREATE TABLE `impressions` (

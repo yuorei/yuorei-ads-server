@@ -4,6 +4,7 @@ sql:
     queries:
       - "db/sqlc/sql/query.sql"
       - "db/sqlc/sql/organization.sql"
+      - "db/sqlc/sql/ads.sql"
     schema: "db/atlas/schema.sql"
     gen:
       go:
