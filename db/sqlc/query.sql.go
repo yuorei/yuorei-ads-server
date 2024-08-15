@@ -11,40 +11,6 @@ import (
 	"time"
 )
 
-const createAd = `-- name: CreateAd :execresult
-INSERT INTO ads (ad_id, ad_group_id, type, content) VALUES (?, ?, ?, ?)
-`
-
-type CreateAdParams struct {
-	AdID      string
-	AdGroupID string
-	Type      string
-	Content   string
-}
-
-func (q *Queries) CreateAd(ctx context.Context, arg CreateAdParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createAd,
-		arg.AdID,
-		arg.AdGroupID,
-		arg.Type,
-		arg.Content,
-	)
-}
-
-const createAdGroup = `-- name: CreateAdGroup :execresult
-INSERT INTO ad_groups (ad_group_id, campaign_id, name) VALUES (?, ?, ?)
-`
-
-type CreateAdGroupParams struct {
-	AdGroupID  string
-	CampaignID string
-	Name       string
-}
-
-func (q *Queries) CreateAdGroup(ctx context.Context, arg CreateAdGroupParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createAdGroup, arg.AdGroupID, arg.CampaignID, arg.Name)
-}
-
 const createCampaign = `-- name: CreateCampaign :execresult
 INSERT INTO campaigns (campaign_id, user_id, name, budget, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)
 `
@@ -132,14 +98,6 @@ func (q *Queries) DeleteAd(ctx context.Context, adID string) (sql.Result, error)
 	return q.db.ExecContext(ctx, deleteAd, adID)
 }
 
-const deleteAdGroup = `-- name: DeleteAdGroup :execresult
-UPDATE ad_groups SET deleted_at = CURRENT_TIMESTAMP WHERE ad_group_id = ?
-`
-
-func (q *Queries) DeleteAdGroup(ctx context.Context, adGroupID string) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteAdGroup, adGroupID)
-}
-
 const deleteCampaign = `-- name: DeleteCampaign :execresult
 UPDATE campaigns SET deleted_at = CURRENT_TIMESTAMP WHERE campaign_id = ?
 `
@@ -170,116 +128,6 @@ UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE user_id = ?
 
 func (q *Queries) DeleteUser(ctx context.Context, userID string) (sql.Result, error) {
 	return q.db.ExecContext(ctx, deleteUser, userID)
-}
-
-const getAdById = `-- name: GetAdById :one
-SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at, is_approval FROM ads WHERE ad_id = ? LIMIT 1
-`
-
-func (q *Queries) GetAdById(ctx context.Context, adID string) (Ad, error) {
-	row := q.db.QueryRowContext(ctx, getAdById, adID)
-	var i Ad
-	err := row.Scan(
-		&i.AdID,
-		&i.AdGroupID,
-		&i.Type,
-		&i.Content,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-		&i.IsApproval,
-	)
-	return i, err
-}
-
-const getAdGroupById = `-- name: GetAdGroupById :one
-SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at, is_approval FROM ad_groups WHERE ad_group_id = ? LIMIT 1
-`
-
-func (q *Queries) GetAdGroupById(ctx context.Context, adGroupID string) (AdGroup, error) {
-	row := q.db.QueryRowContext(ctx, getAdGroupById, adGroupID)
-	var i AdGroup
-	err := row.Scan(
-		&i.AdGroupID,
-		&i.CampaignID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-		&i.IsApproval,
-	)
-	return i, err
-}
-
-const getAdGroupsByCampaignId = `-- name: GetAdGroupsByCampaignId :many
-SELECT ad_group_id, campaign_id, name, created_at, updated_at, deleted_at, is_approval FROM ad_groups WHERE campaign_id = ?
-`
-
-func (q *Queries) GetAdGroupsByCampaignId(ctx context.Context, campaignID string) ([]AdGroup, error) {
-	rows, err := q.db.QueryContext(ctx, getAdGroupsByCampaignId, campaignID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []AdGroup
-	for rows.Next() {
-		var i AdGroup
-		if err := rows.Scan(
-			&i.AdGroupID,
-			&i.CampaignID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.IsApproval,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getAdsByAdGroupId = `-- name: GetAdsByAdGroupId :many
-SELECT ad_id, ad_group_id, type, content, created_at, updated_at, deleted_at, is_approval FROM ads WHERE ad_group_id = ?
-`
-
-func (q *Queries) GetAdsByAdGroupId(ctx context.Context, adGroupID string) ([]Ad, error) {
-	rows, err := q.db.QueryContext(ctx, getAdsByAdGroupId, adGroupID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Ad
-	for rows.Next() {
-		var i Ad
-		if err := rows.Scan(
-			&i.AdID,
-			&i.AdGroupID,
-			&i.Type,
-			&i.Content,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.IsApproval,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getCampaignById = `-- name: GetCampaignById :one
@@ -467,33 +315,6 @@ func (q *Queries) GetUserById(ctx context.Context, userID string) (User, error) 
 		&i.DeletedAt,
 	)
 	return i, err
-}
-
-const updateAd = `-- name: UpdateAd :execresult
-UPDATE ads SET type = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE ad_id = ?
-`
-
-type UpdateAdParams struct {
-	Type    string
-	Content string
-	AdID    string
-}
-
-func (q *Queries) UpdateAd(ctx context.Context, arg UpdateAdParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateAd, arg.Type, arg.Content, arg.AdID)
-}
-
-const updateAdGroup = `-- name: UpdateAdGroup :execresult
-UPDATE ad_groups SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE ad_group_id = ?
-`
-
-type UpdateAdGroupParams struct {
-	Name      string
-	AdGroupID string
-}
-
-func (q *Queries) UpdateAdGroup(ctx context.Context, arg UpdateAdGroupParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateAdGroup, arg.Name, arg.AdGroupID)
 }
 
 const updateCampaign = `-- name: UpdateCampaign :execresult

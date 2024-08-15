@@ -23,8 +23,10 @@ func NewAdsServer(repository *usecase.Repository) *AdsServer {
 }
 
 func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[adsv1.CreateCampaignRequest]) (*connect.Response[adsv1.CreateCampaignResponse], error) {
-	// TODO: 認証後のユーザIDを取得
-	userID := "1"
+	userID, ok := ctx.Value("uid").(string)
+	if !ok || userID == "" {
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
+	}
 	// TODO:変換	req.Msg.StartDate, req.Msg.EndDate を time.Time に変換して代入する
 	startDate := time.Now()
 	endDate := time.Now()

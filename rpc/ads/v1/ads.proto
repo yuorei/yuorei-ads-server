@@ -13,17 +13,17 @@ service AdManagementService {
     // rpc UpdateCampaign(UpdateCampaignRequest) returns (UpdateCampaignResponse);
     // rpc DeleteCampaign(DeleteCampaignRequest) returns (DeleteCampaignResponse);
 
-    // // Ad Group Management
-    // rpc CreateAdGroup(CreateAdGroupRequest) returns (CreateAdGroupResponse);
-    // rpc GetAdGroup(GetAdGroupRequest) returns (GetAdGroupResponse);
-    // rpc UpdateAdGroup(UpdateAdGroupRequest) returns (UpdateAdGroupResponse);
-    // rpc DeleteAdGroup(DeleteAdGroupRequest) returns (DeleteAdGroupResponse);
-
-    // // Ad Management
+    // Ad Management
     // rpc CreateAd(CreateAdRequest) returns (CreateAdResponse);
     // rpc GetAd(GetAdRequest) returns (GetAdResponse);
     // rpc UpdateAd(UpdateAdRequest) returns (UpdateAdResponse);
     // rpc DeleteAd(DeleteAdRequest) returns (DeleteAdResponse);
+
+    // Ad Video
+    // rpc CreateAdVideo(stream CreateAdVideoRequest) returns (CreateAdVideoResponse);
+    // rpc GetAdVideo(GetAdVideoRequest) returns (GetAdVideoResponse);
+    // rpc UpdateAdVideo(UpdateAdVideoRequest) returns (UpdateAdVideoResponse);
+    // rpc DeleteAdVideo(DeleteAdVideoRequest) returns (DeleteAdVideoResponse);
 
     // // Targeting
     // rpc CreateTargeting(CreateTargetingRequest) returns (CreateTargetingResponse);
@@ -89,53 +89,13 @@ message Campaign {
     google.protobuf.Timestamp deleted_at = 10;
 }
 
-// Ad Group messages
-message CreateAdGroupRequest {
-    string campaign_id = 1;
-    string name = 2;
-}
-
-message CreateAdGroupResponse {
-    string ad_group_id = 1;
-}
-
-message GetAdGroupRequest {
-    string ad_group_id = 1;
-}
-
-message GetAdGroupResponse {
-    AdGroup ad_group = 1;
-}
-
-message UpdateAdGroupRequest {
-    string ad_group_id = 1;
-    string name = 2;
-}
-
-message UpdateAdGroupResponse {
-    AdGroup ad_group = 1;
-}
-
-message DeleteAdGroupRequest {
-    string ad_group_id = 1;
-}
-
-message DeleteAdGroupResponse {
-    bool success = 1;
-}
-
-message AdGroup {
-    string ad_group_id = 1;
-    string campaign_id = 2;
-    string name = 3;
-    bool is_approval = 4;
-}
-
 // Ad messages
 message CreateAdRequest {
-    string ad_group_id = 1;
-    string type = 2;
-    string content = 3;
+    string campaign_id = 1;
+    string ad_type = 2;
+    bool is_approval = 3;
+    bool is_open = 4;
+    string ad_link = 5;
 }
 
 message CreateAdResponse {
@@ -152,8 +112,10 @@ message GetAdResponse {
 
 message UpdateAdRequest {
     string ad_id = 1;
-    string type = 2;
-    string content = 3;
+    string ad_type = 2;
+    bool is_approval = 3;
+    bool is_open = 4;
+    string ad_link = 5;
 }
 
 message UpdateAdResponse {
@@ -170,13 +132,55 @@ message DeleteAdResponse {
 
 message Ad {
     string ad_id = 1;
-    string ad_group_id = 2;
-    string type = 3;
-    string content = 4;
+    string campaign_id = 2;
+    string ad_type = 3;
+    bool is_open = 4;
     bool is_approval = 5;
     google.protobuf.Timestamp created_at = 6;
     google.protobuf.Timestamp updated_at = 7;
     google.protobuf.Timestamp deleted_at = 8;
+    string ad_link = 9;
+}
+
+// Ad Video
+message GetAdVideoRequest {
+    string ad_video_id = 1;
+}
+
+message GetAdVideoResponse {
+    AdVideo ad_video = 1;
+}
+
+message UpdateAdVideoRequest {
+    string ad_video_id = 1;
+    string title = 2;
+    string description = 3;
+    string thumbnail_url = 4;
+    string video_url = 5;
+}
+
+message UpdateAdVideoResponse {
+    AdVideo ad_video = 1;
+}
+
+message DeleteAdVideoRequest {
+    string ad_video_id = 1;
+}
+
+message DeleteAdVideoResponse {
+    bool success = 1;
+}
+
+message AdVideo {
+    string ad_video_id = 1;
+    string ad_id = 2;
+    string title = 3;
+    string description = 4;
+    string thumbnail_url = 5;
+    string video_url = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+    google.protobuf.Timestamp deleted_at = 9;
 }
 
 // Targeting messages
@@ -224,7 +228,7 @@ message Targeting {
 }
 
 message Target {
-    string type = 1;
+    string ad_type = 1;
     string value = 2;
 }
 
@@ -244,4 +248,20 @@ message AdPerformance {
     int32 impressions = 2;
     int32 clicks = 3;
     float ctr = 4;
+}
+
+message AdVideoMeta {
+    string id = 1;
+    string user_id = 2;
+    string title = 3;
+    string description = 4;
+    string thumbnail_image_url = 5;
+    repeated string tags = 6;
+    bool private = 7;
+    bool adult = 8;
+    bool external_cutout = 9;
+    bool is_ad = 10;
+
+    string campaign_id = 11;
+    string ad_link = 12;
 }

@@ -11,23 +11,35 @@ import (
 
 type Ad struct {
 	AdID       string
-	AdGroupID  string
-	Type       string
-	Content    string
+	CampaignID string
+	AdType     string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  sql.NullTime
 	IsApproval sql.NullBool
+	IsOpen     bool
+	AdLink     sql.NullString
 }
 
-type AdGroup struct {
-	AdGroupID  string
-	CampaignID string
-	Name       string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  sql.NullTime
-	IsApproval sql.NullBool
+type AdImage struct {
+	AdID        string
+	Title       string
+	Description string
+	ImageUrl    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   sql.NullTime
+}
+
+type AdVideo struct {
+	AdID         string
+	Title        string
+	Description  string
+	ThumbnailUrl string
+	VideoUrl     string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    sql.NullTime
 }
 
 type Campaign struct {

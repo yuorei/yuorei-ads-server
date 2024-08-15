@@ -1,14 +1,18 @@
-table "ad_groups" {
+table "ad_images" {
   schema = schema.ads
-  column "ad_group_id" {
+  column "ad_id" {
     null = false
     type = varchar(255)
   }
-  column "campaign_id" {
+  column "title" {
     null = false
     type = varchar(255)
   }
-  column "name" {
+  column "description" {
+    null = false
+    type = text
+  }
+  column "image_url" {
     null = false
     type = varchar(255)
   }
@@ -27,21 +31,61 @@ table "ad_groups" {
     null = true
     type = timestamp
   }
-  column "is_approval" {
-    null = true
-    type = bool
-  }
-  primary_key {
-    columns = [column.ad_group_id]
-  }
-  foreign_key "ad_groups_ibfk_1" {
-    columns     = [column.campaign_id]
-    ref_columns = [table.campaigns.column.campaign_id]
+  foreign_key "ad_images_ibfk_1" {
+    columns     = [column.ad_id]
+    ref_columns = [table.ads.column.ad_id]
     on_update   = NO_ACTION
     on_delete   = NO_ACTION
   }
-  index "campaign_id" {
-    columns = [column.campaign_id]
+  index "ad_id" {
+    columns = [column.ad_id]
+  }
+}
+table "ad_videos" {
+  schema = schema.ads
+  column "ad_id" {
+    null = false
+    type = varchar(255)
+  }
+  column "title" {
+    null = false
+    type = varchar(255)
+  }
+  column "description" {
+    null = false
+    type = text
+  }
+  column "thumbnail_url" {
+    null = false
+    type = varchar(255)
+  }
+  column "video_url" {
+    null = false
+    type = varchar(255)
+  }
+  column "created_at" {
+    null    = false
+    type    = timestamp
+    default = sql("CURRENT_TIMESTAMP")
+  }
+  column "updated_at" {
+    null      = false
+    type      = timestamp
+    default   = sql("CURRENT_TIMESTAMP")
+    on_update = sql("CURRENT_TIMESTAMP")
+  }
+  column "deleted_at" {
+    null = true
+    type = timestamp
+  }
+  foreign_key "ad_videos_ibfk_1" {
+    columns     = [column.ad_id]
+    ref_columns = [table.ads.column.ad_id]
+    on_update   = NO_ACTION
+    on_delete   = NO_ACTION
+  }
+  index "ad_id" {
+    columns = [column.ad_id]
   }
 }
 table "ads" {
@@ -50,17 +94,13 @@ table "ads" {
     null = false
     type = varchar(255)
   }
-  column "ad_group_id" {
+  column "campaign_id" {
     null = false
     type = varchar(255)
   }
-  column "type" {
+  column "ad_type" {
     null = false
     type = varchar(255)
-  }
-  column "content" {
-    null = false
-    type = text
   }
   column "created_at" {
     null    = false
@@ -81,17 +121,25 @@ table "ads" {
     null = true
     type = bool
   }
+  column "is_open" {
+    null = false
+    type = bool
+  }
+  column "ad_link" {
+    null = true
+    type = varchar(255)
+  }
   primary_key {
     columns = [column.ad_id]
   }
   foreign_key "ads_ibfk_1" {
-    columns     = [column.ad_group_id]
-    ref_columns = [table.ad_groups.column.ad_group_id]
+    columns     = [column.campaign_id]
+    ref_columns = [table.campaigns.column.campaign_id]
     on_update   = NO_ACTION
     on_delete   = NO_ACTION
   }
-  index "ad_group_id" {
-    columns = [column.ad_group_id]
+  index "campaign_id" {
+    columns = [column.campaign_id]
   }
 }
 table "campaigns" {

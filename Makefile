@@ -37,6 +37,8 @@ gen_db:
 
 gen_proto:
 	buf generate
+	rm -r gen/yuovision-proto
+	go mod tidy
 
 prod:
 	set -a && source .env.prod && set +a&&\

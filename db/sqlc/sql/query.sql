@@ -22,33 +22,6 @@ UPDATE campaigns SET name = ?, budget = ?, start_date = ?, end_date = ?, updated
 -- name: DeleteCampaign :execresult
 UPDATE campaigns SET deleted_at = CURRENT_TIMESTAMP WHERE campaign_id = ?;
 
--- name: GetAdGroupById :one
-SELECT * FROM ad_groups WHERE ad_group_id = ? LIMIT 1;
-
--- name: GetAdGroupsByCampaignId :many
-SELECT * FROM ad_groups WHERE campaign_id = ?;
-
--- name: CreateAdGroup :execresult
-INSERT INTO ad_groups (ad_group_id, campaign_id, name) VALUES (?, ?, ?);
-
--- name: UpdateAdGroup :execresult
-UPDATE ad_groups SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE ad_group_id = ?;
-
--- name: DeleteAdGroup :execresult
-UPDATE ad_groups SET deleted_at = CURRENT_TIMESTAMP WHERE ad_group_id = ?;
-
--- name: GetAdById :one
-SELECT * FROM ads WHERE ad_id = ? LIMIT 1;
-
--- name: GetAdsByAdGroupId :many
-SELECT * FROM ads WHERE ad_group_id = ?;
-
--- name: CreateAd :execresult
-INSERT INTO ads (ad_id, ad_group_id, type, content) VALUES (?, ?, ?, ?);
-
--- name: UpdateAd :execresult
-UPDATE ads SET type = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE ad_id = ?;
-
 -- name: DeleteAd :execresult
 UPDATE ads SET deleted_at = CURRENT_TIMESTAMP WHERE ad_id = ?;
 
