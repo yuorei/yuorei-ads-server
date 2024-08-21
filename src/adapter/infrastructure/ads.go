@@ -64,3 +64,24 @@ func (i *Infrastructure) DBCreateAdVideo(ctx context.Context, adVideo *domain.Ad
 	}
 	return adVideo, nil
 }
+
+func (i *Infrastructure) DBGetAdVideos(ctx context.Context, request *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error) {
+	ads, err := i.db.Database.GetAdVideos(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	adVideos := make([]*domain.AdVideoResponse, 0)
+	for _, ad := range ads {
+		adVideos = append(adVideos, &domain.AdVideoResponse{
+			AdID:         ad.AdID,
+			Title:        ad.Title,
+			Description:  ad.Description,
+			VideoUrl:     ad.VideoUrl,
+			ThumbnailUrl: ad.ThumbnailUrl,
+			AdLink:       ad.AdLink.String,
+		})
+	}
+
+	return adVideos, nil
+}

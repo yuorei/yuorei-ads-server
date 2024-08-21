@@ -7,7 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	adsv1 "github.com/yuorei/yuorei-ads/gen/rpc/ads/v1"
+	adsv1 "github.com/yuorei/yuorei-ads-proto/gen/rpc/ads/v1"
 	"github.com/yuorei/yuorei-ads/src/domain"
 	"github.com/yuorei/yuorei-ads/src/usecase"
 )
@@ -41,4 +41,33 @@ func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[ads
 	})
 
 	return res, nil
+}
+
+func (s *AdsServer) GetAdVideo(ctx context.Context, req *connect.Request[adsv1.GetAdVideoRequest]) (*connect.Response[adsv1.GetAdVideoResponseList], error) {
+	adVideoRequest := domain.NewAdVideoRequest(req.Msg.UserAgent, req.Msg.Platform, req.Msg.Language, req.Msg.Url, req.Msg.PageTitle, req.Msg.Referrer, req.Msg.NetworkDownlink, req.Msg.NetworkEffectiveType, req.Msg.IpAddress, req.Msg.Location, req.Msg.Hostname, req.Msg.City, req.Msg.Region, req.Msg.Country, req.Msg.Org, req.Msg.Postal, req.Msg.Timezone, req.Msg.VideoId, req.Msg.VideoTitle, req.Msg.UserId, req.Msg.ClientId, &req.Msg.VideoDescription, req.Msg.VideoTags)
+	adVideos, err := s.usecase.AdsInputPort.GetAdVideos(ctx, adVideoRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ad video: %w", err)
+	}
+
+	getAdVideoResponse := make([]*adsv1.GetAdVideoResponse, 0)
+	for _, ad := range adVideos {
+		getAdVideoResponse = append(getAdVideoResponse, &adsv1.GetAdVideoResponse{
+			AdId:         ad.AdID,
+			Title:        ad.Title,
+			Description:  ad.Description,
+			AdUrl:        ad.AdLink,
+			ThumbnailUrl: ad.ThumbnailUrl,
+			VideoUrl:     ad.VideoUrl,
+		})
+	}
+
+	res := connect.NewResponse(&adsv1.GetAdVideoResponseList{
+		Responses: getAdVideoResponse,
+	})
+	return res, nil
+}
+
+func (s *AdsServer) WatchCountAdVideo(ctx context.Context, req *connect.Request[adsv1.WatchCountAdVideoRequest]) (*connect.Response[adsv1.WatchCountAdVideoResponse], error) {
+	panic("TODO: implement")
 }

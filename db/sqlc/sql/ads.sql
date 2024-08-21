@@ -12,3 +12,23 @@ select * from ads where ad_id = ? limit 1;
 
 -- name: UpdateAd :execresult
 update ads set is_approval = ?, is_open = ?, updated_at = CURRENT_TIMESTAMP where ad_id = ?;
+
+-- name: GetAdVideos :many
+SELECT
+    v.ad_id,
+    v.title,
+    v.description,
+    v.thumbnail_url,
+    v.video_url,
+    a.ad_link
+FROM
+    ad_videos AS v
+LEFT JOIN
+    ads AS a
+ON
+    v.ad_id = a.ad_id
+WHERE
+    a.is_approval = TRUE
+    AND a.is_open = TRUE
+    AND v.deleted_at IS NULL
+    AND a.deleted_at IS NULL;
