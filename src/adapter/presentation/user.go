@@ -6,7 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	userv1 "github.com/yuorei/yuorei-ads/gen/rpc/user/v1"
+	userv1 "github.com/yuorei/yuorei-ads-proto/gen/rpc/user/v1"
 	"github.com/yuorei/yuorei-ads/src/usecase"
 )
 

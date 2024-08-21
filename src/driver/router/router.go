@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"github.com/rs/cors"
-	"github.com/yuorei/yuorei-ads/gen/rpc/ads/v1/adsv1connect"
-	"github.com/yuorei/yuorei-ads/gen/rpc/organization/v1/organizationv1connect"
-	"github.com/yuorei/yuorei-ads/gen/rpc/user/v1/userv1connect"
+	"github.com/yuorei/yuorei-ads-proto/gen/rpc/ads/v1/adsv1connect"
+	"github.com/yuorei/yuorei-ads-proto/gen/rpc/organization/v1/organizationv1connect"
+	"github.com/yuorei/yuorei-ads-proto/gen/rpc/user/v1/userv1connect"
 	"github.com/yuorei/yuorei-ads/middleware"
 	"github.com/yuorei/yuorei-ads/src/adapter/infrastructure"
 	"github.com/yuorei/yuorei-ads/src/adapter/presentation"

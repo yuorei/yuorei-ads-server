@@ -7,7 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	organizationv1 "github.com/yuorei/yuorei-ads/gen/rpc/organization/v1"
+	organizationv1 "github.com/yuorei/yuorei-ads-proto/gen/rpc/organization/v1"
 	"github.com/yuorei/yuorei-ads/src/domain"
 	"github.com/yuorei/yuorei-ads/src/usecase"
 )

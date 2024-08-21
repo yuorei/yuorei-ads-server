@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/rs/cors v1.11.0
+	github.com/yuorei/yuorei-ads-proto v0.0.0-20240820025554-738a1488a73e
 	golang.org/x/net v0.27.0
 	google.golang.org/api v0.190.0
 	google.golang.org/grpc v1.64.1
