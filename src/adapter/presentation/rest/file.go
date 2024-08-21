@@ -191,7 +191,8 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 		adID := domain.NewAdID()
 		ad := domain.NewAd(adID, campaignID, "video", false, false, adLink, tags, time.Now(), time.Now(), nil)
 
-		adVideo := domain.NewAdVideo(adID, title, description, "", thumbnailImageUrl, time.Now(), time.Now(), nil)
+		// TODO: 動画URL、サムネイルURL修正
+		adVideo := domain.NewAdVideo(adID, title, description, "videoURL", thumbnailImageUrl, time.Now(), time.Now(), nil)
 
 		adResult, err := h.usecase.AdsInputPort.CreateAdVideo(ctx, ad, adVideo, userID, uploadID, videoType, imageType)
 		if err != nil {

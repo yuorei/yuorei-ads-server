@@ -10,6 +10,7 @@ type AdsInputPort interface {
 	CreateCampaign(context.Context, *domain.Campaign) (*domain.Campaign, error)
 
 	CreateAdVideo(context.Context, *domain.Ad, *domain.AdVideo, string, string, string, string) (*domain.Ad, error)
+	GetAdVideos(context.Context, *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error)
 }
 
 type AdsRepository interface {
@@ -20,4 +21,6 @@ type AdsRepository interface {
 
 	UploadVideoForYuoVision(context.Context, *domain.UploadVideo, string, string, string) error
 	UploadThumbnailForYuoVision(context.Context, domain.ThumbnailImage, string) error
+
+	DBGetAdVideos(context.Context, *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error)
 }

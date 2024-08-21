@@ -97,6 +97,66 @@ func (q *Queries) GetAdById(ctx context.Context, adID string) (Ad, error) {
 	return i, err
 }
 
+const getAdVideos = `-- name: GetAdVideos :many
+SELECT
+    v.ad_id,
+    v.title,
+    v.description,
+    v.thumbnail_url,
+    v.video_url,
+    a.ad_link
+FROM
+    ad_videos AS v
+LEFT JOIN
+    ads AS a
+ON
+    v.ad_id = a.ad_id
+WHERE
+    a.is_approval = TRUE
+    AND a.is_open = TRUE
+    AND v.deleted_at IS NULL
+    AND a.deleted_at IS NULL
+`
+
+type GetAdVideosRow struct {
+	AdID         string
+	Title        string
+	Description  string
+	ThumbnailUrl string
+	VideoUrl     string
+	AdLink       sql.NullString
+}
+
+func (q *Queries) GetAdVideos(ctx context.Context) ([]GetAdVideosRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAdVideos)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAdVideosRow
+	for rows.Next() {
+		var i GetAdVideosRow
+		if err := rows.Scan(
+			&i.AdID,
+			&i.Title,
+			&i.Description,
+			&i.ThumbnailUrl,
+			&i.VideoUrl,
+			&i.AdLink,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAd = `-- name: UpdateAd :execresult
 update ads set is_approval = ?, is_open = ?, updated_at = CURRENT_TIMESTAMP where ad_id = ?
 `

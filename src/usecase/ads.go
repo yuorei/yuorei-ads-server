@@ -66,3 +66,12 @@ func (r *Repository) CreateAdVideo(ctx context.Context, ad *domain.Ad, adVideo *
 
 	return adResult, nil
 }
+
+func (r *Repository) GetAdVideos(ctx context.Context, req *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error) {
+	result, err := r.adsRepository.adsRepository.DBGetAdVideos(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
