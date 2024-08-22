@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/yuorei/yuorei-ads/db/sqlc"
 	"github.com/yuorei/yuorei-ads/src/domain"
@@ -84,4 +85,16 @@ func (i *Infrastructure) DBGetAdVideos(ctx context.Context, request *domain.GetA
 	}
 
 	return adVideos, nil
+}
+
+func (i *Infrastructure) BigQueryWatchCountAdVideo(ctx context.Context, request *domain.WatchCountAdVideo) error {
+	datasetID := "ads_views"
+	tableID := "ads_video_views"
+	inserter := i.bigquery.Dataset(datasetID).Table(tableID).Inserter()
+
+	if err := inserter.Put(ctx, request); err != nil {
+		return fmt.Errorf("inserter.Put: %w", err)
+	}
+
+	return nil
 }

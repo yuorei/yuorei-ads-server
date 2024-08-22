@@ -75,3 +75,12 @@ func (r *Repository) GetAdVideos(ctx context.Context, req *domain.GetAdVideoRequ
 
 	return result, nil
 }
+
+func (r *Repository) WatchCountAdVideo(ctx context.Context, req *domain.WatchCountAdVideo) error {
+	err := r.adsRepository.adsRepository.BigQueryWatchCountAdVideo(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
