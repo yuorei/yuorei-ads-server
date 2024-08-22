@@ -94,6 +94,7 @@ func (s *AdsServer) WatchCountAdVideo(ctx context.Context, req *connect.Request[
 		UserId:               req.Msg.UserId,
 		ClientId:             req.Msg.ClientId,
 		AdId:                 req.Msg.AdId,
+		WatchedAt:            domain.NowJST(),
 	}
 	err := s.usecase.WatchCountAdVideo(ctx, watchCountAdVideoRequest)
 	if err != nil {

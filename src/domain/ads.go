@@ -143,6 +143,8 @@ type WatchCountAdVideo struct {
 	ClientId string `json:"client_id,omitempty" bigquery:"client_id"`
 	// 広告情報
 	AdId string `json:"ad_id,omitempty" bigquery:"ad_id"`
+	// 時間情報
+	WatchedAt time.Time `json:"watched_at,omitempty" bigquery:"watched_at"`
 }
 
 func NewCampaign(campaignID, userID, name string, budget int, startDate, endDate time.Time, isApproval bool, createdAt time.Time, updatedAt time.Time, deletedAt *time.Time) *Campaign {
