@@ -104,3 +104,24 @@ func (s *AdsServer) WatchCountAdVideo(ctx context.Context, req *connect.Request[
 	res := connect.NewResponse(&adsv1.WatchCountAdVideoResponse{})
 	return res, nil
 }
+
+func (s *AdsServer) GetDailyWatchCountAdVideo(ctx context.Context, req *connect.Request[adsv1.AdsViewedPerDaysRequest]) (*connect.Response[adsv1.AdsViewedPerDaysResponse], error) {
+	result, err := s.usecase.GetDailyWatchCountAdVideo(ctx, req.Msg.AdId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get daily watch count ad video: %w", err)
+	}
+
+	var adsViewedPerDay []*adsv1.AdsViewedPerDay
+	for _, ad := range result.AdsViewedPerDay {
+		adsViewedPerDay = append(adsViewedPerDay, &adsv1.AdsViewedPerDay{
+			Day:   ad.Day,
+			Count: int32(ad.Count),
+		})
+	}
+
+	res := connect.NewResponse(&adsv1.AdsViewedPerDaysResponse{
+		AdId:            result.AdID,
+		AdsViewedPerDay: adsViewedPerDay,
+	})
+	return res, nil
+}

@@ -77,10 +77,19 @@ func (r *Repository) GetAdVideos(ctx context.Context, req *domain.GetAdVideoRequ
 }
 
 func (r *Repository) WatchCountAdVideo(ctx context.Context, req *domain.WatchCountAdVideo) error {
-	err := r.adsRepository.adsRepository.BigQueryWatchCountAdVideo(ctx, req)
+	err := r.adsRepository.adsRepository.BigQueryWatchCountAdVideoInsert(ctx, req)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *Repository) GetDailyWatchCountAdVideo(ctx context.Context, adID string) (*domain.AdsViewedPerDays, error) {
+	result, err := r.adsRepository.adsRepository.BigQueryGetDailyWatchCountAdVideo(ctx, adID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

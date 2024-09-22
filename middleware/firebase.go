@@ -17,7 +17,7 @@ type FirebaseApp struct {
 
 // NewFirebaseApp initializes a new Firebase app
 func NewFirebaseApp() (*FirebaseApp, error) {
-	opt := option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	opt := option.WithCredentialsFile(os.Getenv("GOOGLE_FIREBASE_CREDENTIALS"))
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing app: %v", err)

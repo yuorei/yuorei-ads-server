@@ -147,6 +147,16 @@ type WatchCountAdVideo struct {
 	WatchedAt time.Time `json:"watched_at,omitempty" bigquery:"watched_at"`
 }
 
+type AdsViewedPerDays struct {
+	AdID            string            `json:"ad_id"`
+	AdsViewedPerDay []AdsViewedPerDay `json:"ads_viewed_per_day,omitempty"`
+}
+
+type AdsViewedPerDay struct {
+	Day   string `json:"day"`
+	Count int    `json:"count"`
+}
+
 func NewCampaign(campaignID, userID, name string, budget int, startDate, endDate time.Time, isApproval bool, createdAt time.Time, updatedAt time.Time, deletedAt *time.Time) *Campaign {
 	return &Campaign{
 		CampaignID: campaignID,
