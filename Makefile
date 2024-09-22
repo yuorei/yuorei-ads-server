@@ -19,6 +19,12 @@ migration:
 	-u "mysql://$${MYSQL_USER}:$${MYSQL_PASSWORD}@$${MYSQL_HOST}:$${MYSQL_PORT}/$${MYSQL_DATABASE}" \
 	--to file://db/atlas/schema.hcl
 
+migration_dev:
+	set -a && source .env.dev && set +a&&\
+	atlas schema apply \
+	-u "mysql://$${MYSQL_USER}:$${MYSQL_PASSWORD}@$${MYSQL_HOST}:$${MYSQL_PORT}/$${MYSQL_DATABASE}" \
+	--to file://db/atlas/schema.hcl
+
 schema_output:
 	mkdir -p db/atlas &&\
 	set -a && source .env.prod && set +a&&\
@@ -42,4 +48,8 @@ gen_proto:
 
 prod:
 	set -a && source .env.prod && set +a&&\
+	go run cmd/server/main.go
+
+dev:
+	set -a && source .env.dev && set +a&&\
 	go run cmd/server/main.go
