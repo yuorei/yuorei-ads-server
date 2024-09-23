@@ -2,6 +2,7 @@ package port
 
 import (
 	"context"
+	"time"
 
 	"github.com/yuorei/yuorei-ads/src/domain"
 )
@@ -11,6 +12,8 @@ type AdsInputPort interface {
 
 	CreateAdVideo(context.Context, *domain.Ad, *domain.AdVideo, string, string, string, string) (*domain.Ad, error)
 	GetAdVideos(context.Context, *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error)
+	WatchCountAdVideo(context.Context, *domain.WatchCountAdVideo) error
+	GetDailyWatchCountAdVideo(context.Context, string, time.Time, time.Time) (*domain.AdsViewedPerDays, error)
 }
 
 type AdsRepository interface {
@@ -23,4 +26,6 @@ type AdsRepository interface {
 	UploadThumbnailForYuoVision(context.Context, domain.ThumbnailImage, string) error
 
 	DBGetAdVideos(context.Context, *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error)
+	BigQueryWatchCountAdVideoInsert(context.Context, *domain.WatchCountAdVideo) error
+	BigQueryGetDailyWatchCountAdVideo(context.Context, string, time.Time, time.Time) (*domain.AdsViewedPerDays, error)
 }

@@ -105,16 +105,62 @@ type GetAdVideoRequest struct {
 	Postal               string `json:"postal,omitempty"`
 	Timezone             string `json:"timezone,omitempty"`
 	// ビデオ情報
-	VideoID     string   `json:"video_id,omitempty"`
-	Title       string   `json:"title,omitempty"`
-	Description *string  `json:"description,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
+	VideoID          string   `json:"video_id,omitempty"`
+	VideoTitle       string   `json:"video_title,omitempty"`
+	VideoDescription *string  `json:"video_description,omitempty"`
+	VideoTags        []string `json:"video_tags,omitempty"`
 	// ユーザー情報
 	UserID   string `json:"user_id,omitempty"`
 	ClientID string `json:"client_id,omitempty"`
 }
 
+type WatchCountAdVideo struct {
+	// ブラウザ情報
+	UserAgent            string `json:"user_agent,omitempty" bigquery:"user_agent"`
+	Platform             string `json:"platform,omitempty" bigquery:"platform"`
+	Language             string `json:"language,omitempty" bigquery:"language"`
+	Url                  string `json:"url,omitempty" bigquery:"url"`
+	PageTitle            string `json:"page_title,omitempty" bigquery:"page_title"`
+	Referrer             string `json:"referrer,omitempty" bigquery:"referrer"`
+	NetworkDownlink      string `json:"network_downlink,omitempty" bigquery:"network_downlink"`
+	NetworkEffectiveType string `json:"network_effective_type,omitempty" bigquery:"network_effective_type"`
+	IpAddress            string `json:"ip_address,omitempty" bigquery:"ip_address"`
+	Location             string `json:"location,omitempty" bigquery:"location"`
+	Hostname             string `json:"hostname,omitempty" bigquery:"hostname"`
+	City                 string `json:"city,omitempty" bigquery:"city"`
+	Region               string `json:"region,omitempty" bigquery:"region"`
+	Country              string `json:"country,omitempty" bigquery:"country"`
+	Org                  string `json:"org,omitempty" bigquery:"org"`
+	Postal               string `json:"postal,omitempty" bigquery:"postal"`
+	Timezone             string `json:"timezone,omitempty" bigquery:"timezone"`
+	// ビデオ情報
+	VideoId          string   `json:"video_id,omitempty" bigquery:"video_id"`
+	VideoTitle       string   `json:"video_title,omitempty" bigquery:"video_title"`
+	VideoDescription string   `json:"video_description,omitempty" bigquery:"video_description"`
+	VideoTags        []string `json:"video_tags,omitempty" bigquery:"video_tags"`
+	// ユーザー情報
+	UserId   string `json:"user_id,omitempty" bigquery:"user_id"`
+	ClientId string `json:"client_id,omitempty" bigquery:"client_id"`
+	// 広告情報
+	AdId string `json:"ad_id,omitempty" bigquery:"ad_id"`
+	// 時間情報
+	WatchedAt time.Time `json:"watched_at,omitempty" bigquery:"watched_at"`
+}
+
+type AdsViewedPerDays struct {
+	AdID            string            `json:"ad_id"`
+	AdsViewedPerDay []AdsViewedPerDay `json:"ads_viewed_per_day,omitempty"`
+}
+
+type AdsViewedPerDay struct {
+	Day   string `json:"day"`
+	Count int    `json:"count"`
+}
+
 func NewCampaign(campaignID, userID, name string, budget int, startDate, endDate time.Time, isApproval bool, createdAt time.Time, updatedAt time.Time, deletedAt *time.Time) *Campaign {
+	if campaignID == "" {
+		campaignID = "campaignID_" + NewUUID()
+	}
 	return &Campaign{
 		CampaignID: campaignID,
 		UserID:     userID,
@@ -177,9 +223,9 @@ func NewAdVideoRequest(userAgent, platform, language, url, pageTitle, referrer, 
 		Postal:               postal,
 		Timezone:             timezone,
 		VideoID:              videoID,
-		Title:                title,
-		Description:          description,
-		Tags:                 tags,
+		VideoTitle:           title,
+		VideoDescription:     description,
+		VideoTags:            tags,
 		UserID:               userID,
 		ClientID:             clientID,
 	}

@@ -27,6 +27,11 @@ func NewMySQLDB() *DB {
 		log.Fatal("Error: ", err)
 	}
 
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("Error: ", err)
+	}
+
 	queries := sqlc.New(db)
 	return &DB{
 		Database: queries,
