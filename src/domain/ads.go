@@ -158,6 +158,9 @@ type AdsViewedPerDay struct {
 }
 
 func NewCampaign(campaignID, userID, name string, budget int, startDate, endDate time.Time, isApproval bool, createdAt time.Time, updatedAt time.Time, deletedAt *time.Time) *Campaign {
+	if campaignID == "" {
+		campaignID = "campaignID_" + NewUUID()
+	}
 	return &Campaign{
 		CampaignID: campaignID,
 		UserID:     userID,

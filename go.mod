@@ -3,6 +3,7 @@ module github.com/yuorei/yuorei-ads
 go 1.22.4
 
 require (
+	cloud.google.com/go v0.115.0
 	cloud.google.com/go/bigquery v1.62.0
 	connectrpc.com/connect v1.16.2
 	firebase.google.com/go v3.13.0+incompatible
@@ -11,7 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/rs/cors v1.11.0
-	github.com/yuorei/yuorei-ads-proto v0.0.0-20240922114153-600fb67e6a6b
+	github.com/yuorei/yuorei-ads-proto v0.0.0-20240923010507-c5ab60067964
 	golang.org/x/net v0.27.0
 	google.golang.org/api v0.190.0
 	google.golang.org/grpc v1.64.1
@@ -19,7 +20,6 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.115.0 // indirect
 	cloud.google.com/go/auth v0.7.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect

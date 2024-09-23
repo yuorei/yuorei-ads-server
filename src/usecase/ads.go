@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/yuorei/yuorei-ads/src/domain"
 	"github.com/yuorei/yuorei-ads/src/usecase/port"
@@ -85,8 +86,8 @@ func (r *Repository) WatchCountAdVideo(ctx context.Context, req *domain.WatchCou
 	return nil
 }
 
-func (r *Repository) GetDailyWatchCountAdVideo(ctx context.Context, adID string) (*domain.AdsViewedPerDays, error) {
-	result, err := r.adsRepository.adsRepository.BigQueryGetDailyWatchCountAdVideo(ctx, adID)
+func (r *Repository) GetDailyWatchCountAdVideo(ctx context.Context, adID string, start, end time.Time) (*domain.AdsViewedPerDays, error) {
+	result, err := r.adsRepository.adsRepository.BigQueryGetDailyWatchCountAdVideo(ctx, adID, start, end)
 	if err != nil {
 		return nil, err
 	}

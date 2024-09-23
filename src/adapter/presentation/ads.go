@@ -27,10 +27,20 @@ func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[ads
 	if !ok || userID == "" {
 		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
 	}
-	// TODO:変換	req.Msg.StartDate, req.Msg.EndDate を time.Time に変換して代入する
-	startDate := time.Now()
-	endDate := time.Now()
-	campaign := domain.NewCampaign("id", userID, req.Msg.Name, int(req.Msg.Budget), startDate, endDate, false, time.Now(), time.Now(), nil)
+
+	// Goのデフォルトの形式
+	const LAYOUT = "2006-01-02"
+	startDate, err := time.Parse(LAYOUT, req.Msg.StartDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse start date: %w", err)
+	}
+
+	endDate, err := time.Parse(LAYOUT, req.Msg.EndDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse end date: %w", err)
+	}
+
+	campaign := domain.NewCampaign("", userID, req.Msg.Name, int(req.Msg.Budget), startDate, endDate, false, time.Now(), time.Now(), nil)
 	result, err := s.usecase.CreateCampaign(ctx, campaign)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create campaign: %w", err)
@@ -106,7 +116,15 @@ func (s *AdsServer) WatchCountAdVideo(ctx context.Context, req *connect.Request[
 }
 
 func (s *AdsServer) GetDailyWatchCountAdVideo(ctx context.Context, req *connect.Request[adsv1.AdsViewedPerDaysRequest]) (*connect.Response[adsv1.AdsViewedPerDaysResponse], error) {
-	result, err := s.usecase.GetDailyWatchCountAdVideo(ctx, req.Msg.AdId)
+	userID, ok := ctx.Value("uid").(string)
+	if !ok || userID == "" {
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
+	}
+	// TODO: このユーザーが組織にAdIDを持っているかどうかのチェックが必要
+
+	start := req.Msg.Start.AsTime()
+	end := req.Msg.End.AsTime()
+	result, err := s.usecase.GetDailyWatchCountAdVideo(ctx, req.Msg.AdId, start, end)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get daily watch count ad video: %w", err)
 	}

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
@@ -104,7 +105,7 @@ func (i *Infrastructure) BigQueryWatchCountAdVideoInsert(ctx context.Context, re
 }
 
 // BigQueryGetDailyWatchCountAdVideo: 日ごとの視聴者数をBigQueryから取得
-func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, adID string) (*domain.AdsViewedPerDays, error) {
+func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, adID string, start, end time.Time) (*domain.AdsViewedPerDays, error) {
 	datasetID := "ads_views"
 	tableID := "ads_video_views"
 
@@ -117,10 +118,17 @@ func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, 
 		%s.%s.%s
 	WHERE
 		ad_id = '%s'
+		AND watched_at BETWEEN TIMESTAMP('%s') AND TIMESTAMP('%s')
 	GROUP BY
 		date
 	ORDER BY
-		date`, os.Getenv("GC_BQ_PROJECT_ID"), datasetID, tableID, adID)
+		date`,
+		os.Getenv("GC_BQ_PROJECT_ID"),
+		datasetID,
+		tableID,
+		adID,
+		start.Format("2006-01-02 15:04:05"),
+		end.Format("2006-01-02 15:04:05"))
 
 	query := i.bigquery.Query(queryString)
 	query.Parameters = []bigquery.QueryParameter{
