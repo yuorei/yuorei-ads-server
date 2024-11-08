@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -196,6 +197,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 		adResult, err := h.usecase.AdsInputPort.CreateAdVideo(ctx, ad, adVideo, userID, uploadID, videoType, imageType)
 		if err != nil {
+			log.Printf("Error creating ad video: %v", err)
 			http.Error(w, "Unable to process video meta", http.StatusInternalServerError)
 			return
 		}
@@ -206,9 +208,11 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			AdID string `json:"adID,omitempty"`
 		}{adResult.AdID})
 		if err != nil {
+			log.Printf("Error encoding response: %v", err)
 			http.Error(w, "Unable to encode response", http.StatusInternalServerError)
 		}
 	} else {
+		log.Printf("Chunk %d uploaded", chunkNumber)
 		w.WriteHeader(http.StatusOK)
 	}
 }
