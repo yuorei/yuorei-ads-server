@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -97,7 +98,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to create the video chunk file", http.StatusInternalServerError)
 		return
 	}
-	defer os.Remove(videoTempFileName)
+	// defer os.Remove(videoTempFileName)
 	defer videoDst.Close()
 
 	// 画像ファイルの内容をコピー
@@ -126,7 +127,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unable to create final image file", http.StatusInternalServerError)
 			return
 		}
-		defer os.Remove(finalImageFileName)
+		// defer os.Remove(finalImageFileName)
 		defer finalImageFile.Close()
 
 		finalVideoFileName := "./uploads/" + uploadID + "_video" + "." + videoType
@@ -153,7 +154,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			imageTempFile.Close()
 
 			// 画像チャンクファイルを削除
-			err = os.Remove(imageTempFileName)
+			// err = os.Remove(imageTempFileName)
 			if err != nil {
 				http.Error(w, "Unable to delete image chunk file", http.StatusInternalServerError)
 			}
@@ -176,7 +177,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			videoTempFile.Close()
 
 			// 動画チャンクファイルを削除
-			os.Remove(videoTempFileName)
+			// os.Remove(videoTempFileName)
 		}
 
 		// フォームからAdVideoMetaの情報を取得
@@ -206,6 +207,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			AdID string `json:"adID,omitempty"`
 		}{adResult.AdID})
 		if err != nil {
+			log.Printf("Error encoding response: %v", err)
 			http.Error(w, "Unable to encode response", http.StatusInternalServerError)
 		}
 	} else {
