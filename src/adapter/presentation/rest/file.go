@@ -197,7 +197,6 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 		adResult, err := h.usecase.AdsInputPort.CreateAdVideo(ctx, ad, adVideo, userID, uploadID, videoType, imageType)
 		if err != nil {
-			log.Printf("Error creating ad video: %v", err)
 			http.Error(w, "Unable to process video meta", http.StatusInternalServerError)
 			return
 		}
@@ -212,7 +211,6 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unable to encode response", http.StatusInternalServerError)
 		}
 	} else {
-		log.Printf("Chunk %d uploaded", chunkNumber)
 		w.WriteHeader(http.StatusOK)
 	}
 }
