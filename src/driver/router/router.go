@@ -46,7 +46,7 @@ func NewRouter() {
 	host := os.Getenv("IP") + ":" + os.Getenv("PORT")
 	fmt.Println("Server is running on " + host)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*.yuorei.com", "http://localhost:3000"},
+		AllowedOrigins:   []string{"*.yuorei.com"},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
 		AllowCredentials: true,
 		AllowedHeaders:   []string{"*"},
