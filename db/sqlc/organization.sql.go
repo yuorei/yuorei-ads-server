@@ -31,3 +31,16 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		arg.Category,
 	)
 }
+
+const createOrganizationUser = `-- name: CreateOrganizationUser :execresult
+insert into organizations_users (organization_id, user_id) values (?, ?)
+`
+
+type CreateOrganizationUserParams struct {
+	OrganizationID string
+	UserID         string
+}
+
+func (q *Queries) CreateOrganizationUser(ctx context.Context, arg CreateOrganizationUserParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createOrganizationUser, arg.OrganizationID, arg.UserID)
+}
