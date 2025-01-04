@@ -8,7 +8,54 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"time"
 )
+
+const checkOrganization = `-- name: CheckOrganization :one
+SELECT organizations.organization_id, organization_name, representative_user_id, purpose, category, organizations.created_at, organizations.updated_at, organizations.deleted_at, organizations_users.organization_id, user_id, organizations_users.created_at, organizations_users.updated_at, organizations_users.deleted_at FROM organizations LEFT JOIN organizations_users ON organizations.organization_id = organizations_users.organization_id WHERE organizations.organization_id = ? AND organizations_users.user_id = ?
+`
+
+type CheckOrganizationParams struct {
+	OrganizationID string
+	UserID         string
+}
+
+type CheckOrganizationRow struct {
+	OrganizationID       string
+	OrganizationName     string
+	RepresentativeUserID string
+	Purpose              string
+	Category             string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+	DeletedAt            sql.NullTime
+	OrganizationID_2     sql.NullString
+	UserID               sql.NullString
+	CreatedAt_2          sql.NullTime
+	UpdatedAt_2          sql.NullTime
+	DeletedAt_2          sql.NullTime
+}
+
+func (q *Queries) CheckOrganization(ctx context.Context, arg CheckOrganizationParams) (CheckOrganizationRow, error) {
+	row := q.db.QueryRowContext(ctx, checkOrganization, arg.OrganizationID, arg.UserID)
+	var i CheckOrganizationRow
+	err := row.Scan(
+		&i.OrganizationID,
+		&i.OrganizationName,
+		&i.RepresentativeUserID,
+		&i.Purpose,
+		&i.Category,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.OrganizationID_2,
+		&i.UserID,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.DeletedAt_2,
+	)
+	return i, err
+}
 
 const createAd = `-- name: CreateAd :execresult
 insert into ads (ad_id, campaign_id, ad_type, is_approval,is_open,ad_link) values (?, ?, ?, ? , ?, ?)
@@ -74,6 +121,27 @@ func (q *Queries) CreateAdVideo(ctx context.Context, arg CreateAdVideoParams) (s
 		arg.ThumbnailUrl,
 		arg.VideoUrl,
 	)
+}
+
+const getAd = `-- name: GetAd :one
+SELECT ad_id, campaign_id, ad_type, created_at, updated_at, deleted_at, is_approval, is_open, ad_link FROM ads WHERE ad_id = ? LIMIT 1
+`
+
+func (q *Queries) GetAd(ctx context.Context, adID string) (Ad, error) {
+	row := q.db.QueryRowContext(ctx, getAd, adID)
+	var i Ad
+	err := row.Scan(
+		&i.AdID,
+		&i.CampaignID,
+		&i.AdType,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.IsApproval,
+		&i.IsOpen,
+		&i.AdLink,
+	)
+	return i, err
 }
 
 const getAdById = `-- name: GetAdById :one
@@ -143,6 +211,162 @@ func (q *Queries) GetAdVideos(ctx context.Context) ([]GetAdVideosRow, error) {
 			&i.ThumbnailUrl,
 			&i.VideoUrl,
 			&i.AdLink,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAds = `-- name: ListAds :many
+SELECT ad_id, campaign_id, ad_type, created_at, updated_at, deleted_at, is_approval, is_open, ad_link FROM ads LIMIT ? OFFSET ?
+`
+
+type ListAdsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) ListAds(ctx context.Context, arg ListAdsParams) ([]Ad, error) {
+	rows, err := q.db.QueryContext(ctx, listAds, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Ad
+	for rows.Next() {
+		var i Ad
+		if err := rows.Scan(
+			&i.AdID,
+			&i.CampaignID,
+			&i.AdType,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.IsApproval,
+			&i.IsOpen,
+			&i.AdLink,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAdsByCampaignID = `-- name: ListAdsByCampaignID :many
+SELECT ad_id, campaign_id, ad_type, created_at, updated_at, deleted_at, is_approval, is_open, ad_link FROM ads WHERE campaign_id = ? LIMIT ? OFFSET ?
+`
+
+type ListAdsByCampaignIDParams struct {
+	CampaignID string
+	Limit      int32
+	Offset     int32
+}
+
+func (q *Queries) ListAdsByCampaignID(ctx context.Context, arg ListAdsByCampaignIDParams) ([]Ad, error) {
+	rows, err := q.db.QueryContext(ctx, listAdsByCampaignID, arg.CampaignID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Ad
+	for rows.Next() {
+		var i Ad
+		if err := rows.Scan(
+			&i.AdID,
+			&i.CampaignID,
+			&i.AdType,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.IsApproval,
+			&i.IsOpen,
+			&i.AdLink,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCampaignByOrganizationID = `-- name: ListCampaignByOrganizationID :many
+SELECT campaign_id, c.user_id, name, budget, start_date, end_date, c.created_at, c.updated_at, c.deleted_at, is_approval, organization_id, ou.user_id, ou.created_at, ou.updated_at, ou.deleted_at
+FROM campaigns AS c
+LEFT JOIN organizations_users AS ou ON c.user_id = ou.user_id
+WHERE ou.organization_id = ?
+LIMIT ? OFFSET ?
+`
+
+type ListCampaignByOrganizationIDParams struct {
+	OrganizationID string
+	Limit          int32
+	Offset         int32
+}
+
+type ListCampaignByOrganizationIDRow struct {
+	CampaignID     string
+	UserID         string
+	Name           string
+	Budget         int32
+	StartDate      time.Time
+	EndDate        time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      sql.NullTime
+	IsApproval     sql.NullBool
+	OrganizationID sql.NullString
+	UserID_2       sql.NullString
+	CreatedAt_2    sql.NullTime
+	UpdatedAt_2    sql.NullTime
+	DeletedAt_2    sql.NullTime
+}
+
+func (q *Queries) ListCampaignByOrganizationID(ctx context.Context, arg ListCampaignByOrganizationIDParams) ([]ListCampaignByOrganizationIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCampaignByOrganizationID, arg.OrganizationID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCampaignByOrganizationIDRow
+	for rows.Next() {
+		var i ListCampaignByOrganizationIDRow
+		if err := rows.Scan(
+			&i.CampaignID,
+			&i.UserID,
+			&i.Name,
+			&i.Budget,
+			&i.StartDate,
+			&i.EndDate,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.IsApproval,
+			&i.OrganizationID,
+			&i.UserID_2,
+			&i.CreatedAt_2,
+			&i.UpdatedAt_2,
+			&i.DeletedAt_2,
 		); err != nil {
 			return nil, err
 		}

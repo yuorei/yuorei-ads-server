@@ -14,6 +14,120 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+func (i *Infrastructure) DBCheckOrganizationID(ctx context.Context, organizationID, userID string) error {
+	_, err := i.db.Database.CheckOrganization(ctx,
+		sqlc.CheckOrganizationParams{
+			OrganizationID: organizationID,
+			UserID:         userID,
+		},
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *Infrastructure) DBListCampaignByOrganizationID(ctx context.Context, organizationID string, offset, limit int) ([]*domain.Campaign, error) {
+	campaigns, err := i.db.Database.ListCampaignByOrganizationID(ctx,
+		sqlc.ListCampaignByOrganizationIDParams{
+			OrganizationID: organizationID,
+			Offset:         int32(offset),
+			Limit:          int32(limit),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	campaignList := make([]*domain.Campaign, 0)
+	for _, campaign := range campaigns {
+		campaignList = append(campaignList, &domain.Campaign{
+			CampaignID: campaign.CampaignID,
+			UserID:     campaign.UserID,
+			Name:       campaign.Name,
+			Budget:     int(campaign.Budget),
+			StartDate:  campaign.StartDate,
+			EndDate:    campaign.EndDate,
+			IsApproval: campaign.IsApproval.Bool,
+		})
+	}
+
+	return campaignList, nil
+}
+
+func (i *Infrastructure) DBListAdminAds(ctx context.Context, userID string, offset, limit int) ([]*domain.Ad, error) {
+	// ads, err := i.db.Database.ListAdminAds(ctx,
+	// 	sqlc.ListAdminAdsParams{
+	// 		UserID: userID,
+	// 		Offset: int32(offset),
+	// 		Limit:  int32(limit),
+	// 	},
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// adList := make([]*domain.Ad, 0)
+	// for _, ad := range ads {
+	// 	adList = append(adList, &domain.Ad{
+	// 		AdID:       ad.AdID,
+	// 		CampaignID: ad.CampaignID,
+	// 		AdType:     ad.AdType,
+	// 		IsApproval: ad.IsApproval.Bool,
+	// 		IsOpen:     ad.IsOpen,
+	// 		AdLink:     ad.AdLink.String,
+	// 	})
+	// }
+
+	// return adList, nil
+	return nil, nil
+}
+
+func (i *Infrastructure) DBGetAd(ctx context.Context, adID string) (*domain.Ad, error) {
+	ad, err := i.db.Database.GetAd(ctx,
+		adID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Ad{
+		AdID:       ad.AdID,
+		CampaignID: ad.CampaignID,
+		AdType:     ad.AdType,
+		IsApproval: ad.IsApproval.Bool,
+		IsOpen:     ad.IsOpen,
+		AdLink:     ad.AdLink.String,
+	}, nil
+}
+
+func (i *Infrastructure) DBListAdsByCampaignID(ctx context.Context, campaignID string, offset, limit int) ([]*domain.Ad, error) {
+	ads, err := i.db.Database.ListAdsByCampaignID(ctx,
+		sqlc.ListAdsByCampaignIDParams{
+			CampaignID: campaignID,
+			Limit:      int32(limit),
+			Offset:     int32(offset),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	adList := make([]*domain.Ad, 0)
+	for _, ad := range ads {
+		adList = append(adList, &domain.Ad{
+			AdID:       ad.AdID,
+			CampaignID: ad.CampaignID,
+			AdType:     ad.AdType,
+			IsApproval: ad.IsApproval.Bool,
+			IsOpen:     ad.IsOpen,
+			AdLink:     ad.AdLink.String,
+		})
+	}
+
+	return adList, nil
+}
+
 func (i *Infrastructure) DBCreateCampaign(ctx context.Context, campaign *domain.Campaign) (*domain.Campaign, error) {
 	_, err := i.db.Database.CreateCampaign(ctx,
 		sqlc.CreateCampaignParams{
@@ -76,7 +190,7 @@ func (i *Infrastructure) DBGetAdVideos(ctx context.Context, request *domain.GetA
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println(ads)
 	adVideos := make([]*domain.AdVideoResponse, 0)
 	for _, ad := range ads {
 		adVideos = append(adVideos, &domain.AdVideoResponse{
@@ -100,7 +214,7 @@ func (i *Infrastructure) BigQueryWatchCountAdVideoInsert(ctx context.Context, re
 	if err := inserter.Put(ctx, request); err != nil {
 		return fmt.Errorf("inserter.Put: %w", err)
 	}
-
+	fmt.Println("BigQueryWatchCountAdVideoInsert: successいれたよ", request)
 	return nil
 }
 
@@ -108,7 +222,7 @@ func (i *Infrastructure) BigQueryWatchCountAdVideoInsert(ctx context.Context, re
 func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, adID string, start, end time.Time) (*domain.AdsViewedPerDays, error) {
 	datasetID := "ads_views"
 	tableID := "ads_video_views"
-
+	fmt.Println("BigQueryGetDailyWatchCountAdVideo:", adID, start, end)
 	// 日ごとの視聴者数を取得するクエリ
 	queryString := fmt.Sprintf(`
 	SELECT
@@ -129,7 +243,7 @@ func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, 
 		adID,
 		start.Format("2006-01-02 15:04:05"),
 		end.Format("2006-01-02 15:04:05"))
-
+	fmt.Println(queryString)
 	query := i.bigquery.Query(queryString)
 	query.Parameters = []bigquery.QueryParameter{
 		{
@@ -181,6 +295,6 @@ func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, 
 			Count: row.ViewCount,
 		})
 	}
-
+	fmt.Println("BigQueryGetDailyWatchCountAdVideo: success取得したよ", adsViewedPerDays)
 	return adsViewedPerDays, nil
 }
