@@ -18,6 +18,42 @@ func NewAdsRepository(adsRepository port.AdsRepository) *AdsUseCase {
 	}
 }
 
+func (r *Repository) CheckOrganizationID(ctx context.Context, organizationID, userID string) error {
+	err := r.adsRepository.adsRepository.DBCheckOrganizationID(ctx, organizationID, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) ListCampaignByOrganizationID(ctx context.Context, organizationID string, offset, limit int) ([]*domain.Campaign, error) {
+	result, err := r.adsRepository.adsRepository.DBListCampaignByOrganizationID(ctx, organizationID, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (r *Repository) ListAdminAds(ctx context.Context, userID string, offset, limit int) ([]*domain.Ad, error) {
+	result, err := r.adsRepository.adsRepository.DBListAdminAds(ctx, userID, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (r *Repository) ListAdsByCampaignID(ctx context.Context, campaignID string, offset, limit int) ([]*domain.Ad, error) {
+	result, err := r.adsRepository.adsRepository.DBListAdsByCampaignID(ctx, campaignID, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *Repository) CreateCampaign(ctx context.Context, campaign *domain.Campaign) (*domain.Campaign, error) {
 	result, err := r.adsRepository.adsRepository.DBCreateCampaign(ctx, campaign)
 	if err != nil {
@@ -66,6 +102,15 @@ func (r *Repository) CreateAdVideo(ctx context.Context, ad *domain.Ad, adVideo *
 	}
 
 	return adResult, nil
+}
+
+func (r *Repository) GetAd(ctx context.Context, adID string) (*domain.Ad, error) {
+	result, err := r.adsRepository.adsRepository.DBGetAd(ctx, adID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (r *Repository) GetAdVideos(ctx context.Context, req *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error) {

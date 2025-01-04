@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	adsv1 "github.com/yuorei/yuorei-ads-proto/gen/rpc/ads/v1"
 	"github.com/yuorei/yuorei-ads/src/domain"
@@ -20,6 +21,38 @@ func NewAdsServer(repository *usecase.Repository) *AdsServer {
 	return &AdsServer{
 		usecase: usecase.NewUseCase(repository),
 	}
+}
+
+func (s *AdsServer) ListCampaignByOrganizationID(ctx context.Context, req *connect.Request[adsv1.ListCampaignByOrganizationIDRequest]) (*connect.Response[adsv1.ListCampaignByOrganizationIDResponse], error) {
+	userID, ok := ctx.Value("uid").(string)
+	if !ok || userID == "" {
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
+	}
+	err := s.usecase.CheckOrganizationID(ctx, req.Msg.OrganizationId, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check organizationID: %w", err)
+	}
+
+	campaigns, err := s.usecase.ListCampaignByOrganizationID(ctx, req.Msg.OrganizationId, int(req.Msg.Offset), int(req.Msg.Limit))
+	if err != nil {
+		return nil, fmt.Errorf("failed to list campaign by organizationID: %w", err)
+	}
+
+	var campaignList []*adsv1.Campaign
+	for _, campaign := range campaigns {
+		campaignList = append(campaignList, &adsv1.Campaign{
+			CampaignId: campaign.CampaignID,
+			Name:       campaign.Name,
+			Budget:     int32(campaign.Budget),
+			StartDate:  campaign.StartDate.Format("2006-01-02"),
+			EndDate:    campaign.EndDate.Format("2006-01-02"),
+		})
+	}
+
+	res := connect.NewResponse(&adsv1.ListCampaignByOrganizationIDResponse{
+		Campaigns: campaignList,
+	})
+	return res, nil
 }
 
 func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[adsv1.CreateCampaignRequest]) (*connect.Response[adsv1.CreateCampaignResponse], error) {
@@ -50,6 +83,100 @@ func (s *AdsServer) CreateCampaign(ctx context.Context, req *connect.Request[ads
 		CampaignId: result.CampaignID,
 	})
 
+	return res, nil
+}
+
+func (s *AdsServer) GetAd(ctx context.Context, req *connect.Request[adsv1.GetAdRequest]) (*connect.Response[adsv1.GetAdResponse], error) {
+	ad, err := s.usecase.GetAd(ctx, req.Msg.AdId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create ad video: %w", err)
+	}
+
+	var deleteAt *timestamppb.Timestamp
+	if ad.DeleteAt == nil {
+		deleteAt = nil
+	} else {
+		deleteAt = timestamppb.New(*ad.DeleteAt)
+	}
+
+	res := connect.NewResponse(&adsv1.GetAdResponse{
+		Ad: &adsv1.Ad{
+			AdId:       ad.AdID,
+			CampaignId: ad.CampaignID,
+			AdType:     ad.AdType,
+			CreatedAt:  timestamppb.New(ad.CreatedAt),
+			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
+			DeletedAt:  deleteAt,
+			IsApproval: ad.IsApproval,
+			IsOpen:     ad.IsOpen,
+			AdLink:     ad.AdLink,
+		},
+	})
+	return res, nil
+
+}
+
+func (s *AdsServer) ListAdminAds(ctx context.Context, req *connect.Request[adsv1.ListAdminAdsRequest]) (*connect.Response[adsv1.ListAdminAdsResponse], error) {
+	userID, ok := ctx.Value("uid").(string)
+	if !ok || userID == "" {
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
+	}
+
+	ads, err := s.usecase.ListAdminAds(ctx, userID, int(req.Msg.Offset), int(req.Msg.Limit))
+	if err != nil {
+		return nil, fmt.Errorf("failed to list ads: %w", err)
+	}
+
+	var adList []*adsv1.Ad
+	for _, ad := range ads {
+		adList = append(adList, &adsv1.Ad{
+			AdId:       ad.AdID,
+			CampaignId: ad.CampaignID,
+			AdType:     ad.AdType,
+			CreatedAt:  timestamppb.New(ad.CreatedAt),
+			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
+			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			IsApproval: ad.IsApproval,
+			IsOpen:     ad.IsOpen,
+			AdLink:     ad.AdLink,
+		})
+	}
+
+	res := connect.NewResponse(&adsv1.ListAdminAdsResponse{
+		Ads: adList,
+	})
+	return res, nil
+}
+
+func (s *AdsServer) ListAdsByCampaignID(ctx context.Context, req *connect.Request[adsv1.ListAdsByCampaignIDRequest]) (*connect.Response[adsv1.ListAdsByCampaignIDResponse], error) {
+	userID, ok := ctx.Value("uid").(string)
+	if !ok || userID == "" {
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("failed to get userID"))
+	}
+
+	ads, err := s.usecase.ListAdsByCampaignID(ctx, req.Msg.CampaignId, int(req.Msg.Offset), int(req.Msg.Limit))
+	if err != nil {
+		return nil, fmt.Errorf("failed to list ads by campaignID: %w", err)
+	}
+
+	var adList []*adsv1.Ad
+	for _, ad := range ads {
+		adList = append(adList, &adsv1.Ad{
+			AdId:       ad.AdID,
+			CampaignId: ad.CampaignID,
+			AdType:     ad.AdType,
+			CreatedAt:  timestamppb.New(ad.CreatedAt),
+			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
+			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			IsApproval: ad.IsApproval,
+			IsOpen:     ad.IsOpen,
+			AdLink:     ad.AdLink,
+		})
+	}
+
+	res := connect.NewResponse(&adsv1.ListAdsByCampaignIDResponse{
+		Ads: adList,
+	})
 	return res, nil
 }
 

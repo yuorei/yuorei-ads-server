@@ -1,3 +1,22 @@
+-- name: CheckOrganization :one
+SELECT * FROM organizations LEFT JOIN organizations_users ON organizations.organization_id = organizations_users.organization_id WHERE organizations.organization_id = ? AND organizations_users.user_id = ?;
+
+-- name: ListCampaignByOrganizationID :many
+SELECT *
+FROM campaigns AS c
+LEFT JOIN organizations_users AS ou ON c.user_id = ou.user_id
+WHERE ou.organization_id = ?
+LIMIT ? OFFSET ?;
+
+-- name: ListAds :many
+SELECT * FROM ads LIMIT ? OFFSET ?;
+
+-- name: ListAdsByCampaignID :many
+SELECT * FROM ads WHERE campaign_id = ? LIMIT ? OFFSET ?;
+
+-- name: GetAd :one
+SELECT * FROM ads WHERE ad_id = ? LIMIT 1;
+
 -- name: CreateAd :execresult
 insert into ads (ad_id, campaign_id, ad_type, is_approval,is_open,ad_link) values (?, ?, ?, ? , ?, ?);
 

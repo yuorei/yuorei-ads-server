@@ -34,6 +34,17 @@ func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationI
 		return nil, err
 	}
 
+	_, err = i.db.Database.CreateOrganizationUser(ctx,
+		sqlc.CreateOrganizationUserParams{
+			OrganizationID: organization.ID,
+			UserID:         organization.RepresentativeUserID,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return organization, nil
 }
 
