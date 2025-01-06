@@ -9,6 +9,44 @@ import (
 	"github.com/yuorei/yuorei-ads/src/domain"
 )
 
+func (i *Infrastructure) DBGetOrganization(ctx context.Context, organizationID string) (*domain.Organization, error) {
+	organization, err := i.db.Database.GetOrganization(ctx,
+		organizationID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Organization{
+		ID:                   organization.OrganizationID,
+		OrganizationName:     organization.OrganizationName,
+		RepresentativeUserID: organization.RepresentativeUserID,
+		Purpose:              organization.Purpose,
+		Category:             organization.Category,
+		CreatedAt:            organization.CreatedAt,
+		UpdatedAt:            organization.UpdatedAt,
+	}, nil
+}
+
+func (i *Infrastructure) DBGetOrganizationByUserID(ctx context.Context, userID string) (*domain.Organization, error) {
+	organization, err := i.db.Database.GetOrganizationByUserID(ctx,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Organization{
+		ID:                   organization.OrganizationID,
+		OrganizationName:     organization.OrganizationName,
+		RepresentativeUserID: organization.RepresentativeUserID,
+		Purpose:              organization.Purpose,
+		Category:             organization.Category,
+		CreatedAt:            organization.CreatedAt,
+		UpdatedAt:            organization.UpdatedAt,
+	}, nil
+}
+
 func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret, userID string) (*domain.Organization, error) {
 	organization := &domain.Organization{}
 	hit, err := i.getFromRedis(ctx, clientID+"_"+ClientSecret, organization)
@@ -34,17 +72,6 @@ func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationI
 		return nil, err
 	}
 
-	_, err = i.db.Database.CreateOrganizationUser(ctx,
-		sqlc.CreateOrganizationUserParams{
-			OrganizationID: organization.ID,
-			UserID:         organization.RepresentativeUserID,
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return organization, nil
 }
 
@@ -54,4 +81,17 @@ func (i *Infrastructure) TmpSaveRedisCreateOrganization(ctx context.Context, org
 		return nil, err
 	}
 	return organization, nil
+}
+
+func (i *Infrastructure) DBCreateOrganizationUser(ctx context.Context, organizationID, userID string) error {
+	_, err := i.db.Database.CreateOrganizationUser(ctx,
+		sqlc.CreateOrganizationUserParams{
+			OrganizationID: organizationID,
+			UserID:         userID,
+		},
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

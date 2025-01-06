@@ -14,6 +14,25 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+func (i *Infrastructure) DBGetCampaign(ctx context.Context, campaignID string) (*domain.Campaign, error) {
+	campaign, err := i.db.Database.GetCampaign(ctx,
+		campaignID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Campaign{
+		CampaignID: campaign.CampaignID,
+		UserID:     campaign.UserID,
+		Name:       campaign.Name,
+		Budget:     int(campaign.Budget),
+		StartDate:  campaign.StartDate,
+		EndDate:    campaign.EndDate,
+		IsApproval: campaign.IsApproval.Bool,
+	}, nil
+}
+
 func (i *Infrastructure) DBCheckOrganizationID(ctx context.Context, organizationID, userID string) error {
 	_, err := i.db.Database.CheckOrganization(ctx,
 		sqlc.CheckOrganizationParams{
@@ -190,7 +209,7 @@ func (i *Infrastructure) DBGetAdVideos(ctx context.Context, request *domain.GetA
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(ads)
+
 	adVideos := make([]*domain.AdVideoResponse, 0)
 	for _, ad := range ads {
 		adVideos = append(adVideos, &domain.AdVideoResponse{
@@ -214,7 +233,7 @@ func (i *Infrastructure) BigQueryWatchCountAdVideoInsert(ctx context.Context, re
 	if err := inserter.Put(ctx, request); err != nil {
 		return fmt.Errorf("inserter.Put: %w", err)
 	}
-	fmt.Println("BigQueryWatchCountAdVideoInsert: successいれたよ", request)
+
 	return nil
 }
 
@@ -222,7 +241,7 @@ func (i *Infrastructure) BigQueryWatchCountAdVideoInsert(ctx context.Context, re
 func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, adID string, start, end time.Time) (*domain.AdsViewedPerDays, error) {
 	datasetID := "ads_views"
 	tableID := "ads_video_views"
-	fmt.Println("BigQueryGetDailyWatchCountAdVideo:", adID, start, end)
+
 	// 日ごとの視聴者数を取得するクエリ
 	queryString := fmt.Sprintf(`
 	SELECT
@@ -243,7 +262,7 @@ func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, 
 		adID,
 		start.Format("2006-01-02 15:04:05"),
 		end.Format("2006-01-02 15:04:05"))
-	fmt.Println(queryString)
+
 	query := i.bigquery.Query(queryString)
 	query.Parameters = []bigquery.QueryParameter{
 		{
@@ -295,6 +314,6 @@ func (i *Infrastructure) BigQueryGetDailyWatchCountAdVideo(ctx context.Context, 
 			Count: row.ViewCount,
 		})
 	}
-	fmt.Println("BigQueryGetDailyWatchCountAdVideo: success取得したよ", adsViewedPerDays)
+
 	return adsViewedPerDays, nil
 }

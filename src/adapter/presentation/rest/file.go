@@ -183,7 +183,7 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 		// フォームからAdVideoMetaの情報を取得
 		title := r.FormValue("title")
 		description := r.FormValue("description")
-		thumbnailImageUrl := r.FormValue("thumbnail_image_url")
+		// thumbnailImageUrl := r.FormValue("thumbnail_image_url")
 		tagString := r.FormValue("tags")
 		tags := strings.Split(tagString, ",")
 		campaignID := r.FormValue("campaign_id")
@@ -192,12 +192,13 @@ func (h *Handler) UploadAdVideoHandler(w http.ResponseWriter, r *http.Request) {
 		adID := domain.NewAdID()
 		ad := domain.NewAd(adID, campaignID, "video", false, false, adLink, tags, time.Now(), time.Now(), nil)
 
-		// TODO: 動画URL、サムネイルURL修正
-		adVideo := domain.NewAdVideo(adID, title, description, "videoURL", thumbnailImageUrl, time.Now(), time.Now(), nil)
+		videoURL := fmt.Sprintf("%s/video/%s/output_%s.m3u8", os.Getenv("S3_URL"), adID, adID)
+		thumbnailImageUrl := fmt.Sprintf("%s/%s/%s.webp", os.Getenv("S3_URL"), "thumbnail-image", adID)
+		adVideo := domain.NewAdVideo(adID, title, description, videoURL, thumbnailImageUrl, time.Now(), time.Now(), nil)
 
 		adResult, err := h.usecase.AdsInputPort.CreateAdVideo(ctx, ad, adVideo, userID, uploadID, videoType, imageType)
 		if err != nil {
-			http.Error(w, "Unable to process video meta", http.StatusInternalServerError)
+			http.Error(w, "Unable to process video meta: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 

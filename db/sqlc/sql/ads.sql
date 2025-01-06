@@ -8,6 +8,9 @@ LEFT JOIN organizations_users AS ou ON c.user_id = ou.user_id
 WHERE ou.organization_id = ?
 LIMIT ? OFFSET ?;
 
+-- name: GetCampaign :one
+SELECT * FROM campaigns WHERE campaign_id = ? LIMIT 1;
+
 -- name: ListAds :many
 SELECT * FROM ads LIMIT ? OFFSET ?;
 

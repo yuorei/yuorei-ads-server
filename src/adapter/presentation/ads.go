@@ -23,6 +23,26 @@ func NewAdsServer(repository *usecase.Repository) *AdsServer {
 	}
 }
 
+func (s *AdsServer) GetCampaign(ctx context.Context, req *connect.Request[adsv1.GetCampaignRequest]) (*connect.Response[adsv1.GetCampaignResponse], error) {
+	campaign, err := s.usecase.GetCampaign(ctx, req.Msg.CampaignId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get campaign: %w", err)
+	}
+
+	res := connect.NewResponse(&adsv1.GetCampaignResponse{
+		Campaign: &adsv1.Campaign{
+			CampaignId: campaign.CampaignID,
+			UserId:     campaign.UserID,
+			Name:       campaign.Name,
+			Budget:     int32(campaign.Budget),
+			StartDate:  campaign.StartDate.Format("2006-01-02"),
+			EndDate:    campaign.EndDate.Format("2006-01-02"),
+			IsApproval: campaign.IsApproval,
+		},
+	})
+	return res, nil
+}
+
 func (s *AdsServer) ListCampaignByOrganizationID(ctx context.Context, req *connect.Request[adsv1.ListCampaignByOrganizationIDRequest]) (*connect.Response[adsv1.ListCampaignByOrganizationIDResponse], error) {
 	userID, ok := ctx.Value("uid").(string)
 	if !ok || userID == "" {
@@ -129,13 +149,19 @@ func (s *AdsServer) ListAdminAds(ctx context.Context, req *connect.Request[adsv1
 
 	var adList []*adsv1.Ad
 	for _, ad := range ads {
+		var deleteAt *timestamppb.Timestamp
+		if ad.DeleteAt == nil {
+			deleteAt = nil
+		} else {
+			deleteAt = timestamppb.New(*ad.DeleteAt)
+		}
 		adList = append(adList, &adsv1.Ad{
 			AdId:       ad.AdID,
 			CampaignId: ad.CampaignID,
 			AdType:     ad.AdType,
 			CreatedAt:  timestamppb.New(ad.CreatedAt),
 			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
-			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			DeletedAt:  deleteAt,
 			IsApproval: ad.IsApproval,
 			IsOpen:     ad.IsOpen,
 			AdLink:     ad.AdLink,
@@ -161,13 +187,19 @@ func (s *AdsServer) ListAdsByCampaignID(ctx context.Context, req *connect.Reques
 
 	var adList []*adsv1.Ad
 	for _, ad := range ads {
+		var deleteAt *timestamppb.Timestamp
+		if ad.DeleteAt == nil {
+			deleteAt = nil
+		} else {
+			deleteAt = timestamppb.New(*ad.DeleteAt)
+		}
 		adList = append(adList, &adsv1.Ad{
 			AdId:       ad.AdID,
 			CampaignId: ad.CampaignID,
 			AdType:     ad.AdType,
 			CreatedAt:  timestamppb.New(ad.CreatedAt),
 			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
-			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			DeletedAt:  deleteAt,
 			IsApproval: ad.IsApproval,
 			IsOpen:     ad.IsOpen,
 			AdLink:     ad.AdLink,

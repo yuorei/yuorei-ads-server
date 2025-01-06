@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createOrganization = `-- name: CreateOrganization :execresult
@@ -43,4 +44,65 @@ type CreateOrganizationUserParams struct {
 
 func (q *Queries) CreateOrganizationUser(ctx context.Context, arg CreateOrganizationUserParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createOrganizationUser, arg.OrganizationID, arg.UserID)
+}
+
+const getOrganization = `-- name: GetOrganization :one
+SELECT organization_id, organization_name, representative_user_id, purpose, category, created_at, updated_at, deleted_at FROM organizations WHERE organization_id = ?
+`
+
+func (q *Queries) GetOrganization(ctx context.Context, organizationID string) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, getOrganization, organizationID)
+	var i Organization
+	err := row.Scan(
+		&i.OrganizationID,
+		&i.OrganizationName,
+		&i.RepresentativeUserID,
+		&i.Purpose,
+		&i.Category,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getOrganizationByUserID = `-- name: GetOrganizationByUserID :one
+SELECT organizations.organization_id, organization_name, representative_user_id, purpose, category, organizations.created_at, organizations.updated_at, organizations.deleted_at, organizations_users.organization_id, user_id, organizations_users.created_at, organizations_users.updated_at, organizations_users.deleted_at FROM organizations LEFT JOIN organizations_users ON organizations.organization_id = organizations_users.organization_id WHERE organizations_users.user_id = ?
+`
+
+type GetOrganizationByUserIDRow struct {
+	OrganizationID       string
+	OrganizationName     string
+	RepresentativeUserID string
+	Purpose              string
+	Category             string
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+	DeletedAt            sql.NullTime
+	OrganizationID_2     sql.NullString
+	UserID               sql.NullString
+	CreatedAt_2          sql.NullTime
+	UpdatedAt_2          sql.NullTime
+	DeletedAt_2          sql.NullTime
+}
+
+func (q *Queries) GetOrganizationByUserID(ctx context.Context, userID string) (GetOrganizationByUserIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getOrganizationByUserID, userID)
+	var i GetOrganizationByUserIDRow
+	err := row.Scan(
+		&i.OrganizationID,
+		&i.OrganizationName,
+		&i.RepresentativeUserID,
+		&i.Purpose,
+		&i.Category,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.OrganizationID_2,
+		&i.UserID,
+		&i.CreatedAt_2,
+		&i.UpdatedAt_2,
+		&i.DeletedAt_2,
+	)
+	return i, err
 }
