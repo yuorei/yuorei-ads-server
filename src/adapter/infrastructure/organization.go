@@ -9,6 +9,44 @@ import (
 	"github.com/yuorei/yuorei-ads/src/domain"
 )
 
+func (i *Infrastructure) DBGetOrganization(ctx context.Context, organizationID string) (*domain.Organization, error) {
+	organization, err := i.db.Database.GetOrganization(ctx,
+		organizationID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Organization{
+		ID:                   organization.OrganizationID,
+		OrganizationName:     organization.OrganizationName,
+		RepresentativeUserID: organization.RepresentativeUserID,
+		Purpose:              organization.Purpose,
+		Category:             organization.Category,
+		CreatedAt:            organization.CreatedAt,
+		UpdatedAt:            organization.UpdatedAt,
+	}, nil
+}
+
+func (i *Infrastructure) DBGetOrganizationByUserID(ctx context.Context, userID string) (*domain.Organization, error) {
+	organization, err := i.db.Database.GetOrganizationByUserID(ctx,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Organization{
+		ID:                   organization.OrganizationID,
+		OrganizationName:     organization.OrganizationName,
+		RepresentativeUserID: organization.RepresentativeUserID,
+		Purpose:              organization.Purpose,
+		Category:             organization.Category,
+		CreatedAt:            organization.CreatedAt,
+		UpdatedAt:            organization.UpdatedAt,
+	}, nil
+}
+
 func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationID, clientID, ClientSecret, userID string) (*domain.Organization, error) {
 	organization := &domain.Organization{}
 	hit, err := i.getFromRedis(ctx, clientID+"_"+ClientSecret, organization)
