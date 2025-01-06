@@ -1,9 +1,11 @@
-FROM golang:1.23
+# Build stage
+FROM golang:1.23 AS builder
 WORKDIR /src
 COPY . .
 
-RUN go build -o /bin/ads ./cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/ads ./cmd/server/main.go
 
-FROM scratch
-COPY --from=0 /bin/ads /bin/ads
+# Final stage
+# FROM scratch
+# COPY --from=builder /bin/ads /bin/ads
 CMD ["/bin/ads"]
