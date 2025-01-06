@@ -2,6 +2,7 @@ package client
 
 import (
 	"log"
+	"os"
 
 	"github.com/yuorei/yuorei-ads/yuovision-proto/go/video/video_grpc"
 
@@ -22,8 +23,7 @@ func NewClientYuoVision() *ClientYuoVision {
 }
 
 func (c *ClientYuoVision) NewConnectYuoVision() {
-	address := "localhost:50051"
-
+	address := os.Getenv("YUOVISION_ADDRESS")
 	conn, err := grpc.NewClient(
 		address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
