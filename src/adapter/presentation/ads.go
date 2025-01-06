@@ -129,13 +129,19 @@ func (s *AdsServer) ListAdminAds(ctx context.Context, req *connect.Request[adsv1
 
 	var adList []*adsv1.Ad
 	for _, ad := range ads {
+		var deleteAt *timestamppb.Timestamp
+		if ad.DeleteAt == nil {
+			deleteAt = nil
+		} else {
+			deleteAt = timestamppb.New(*ad.DeleteAt)
+		}
 		adList = append(adList, &adsv1.Ad{
 			AdId:       ad.AdID,
 			CampaignId: ad.CampaignID,
 			AdType:     ad.AdType,
 			CreatedAt:  timestamppb.New(ad.CreatedAt),
 			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
-			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			DeletedAt:  deleteAt,
 			IsApproval: ad.IsApproval,
 			IsOpen:     ad.IsOpen,
 			AdLink:     ad.AdLink,
@@ -161,13 +167,19 @@ func (s *AdsServer) ListAdsByCampaignID(ctx context.Context, req *connect.Reques
 
 	var adList []*adsv1.Ad
 	for _, ad := range ads {
+		var deleteAt *timestamppb.Timestamp
+		if ad.DeleteAt == nil {
+			deleteAt = nil
+		} else {
+			deleteAt = timestamppb.New(*ad.DeleteAt)
+		}
 		adList = append(adList, &adsv1.Ad{
 			AdId:       ad.AdID,
 			CampaignId: ad.CampaignID,
 			AdType:     ad.AdType,
 			CreatedAt:  timestamppb.New(ad.CreatedAt),
 			UpdatedAt:  timestamppb.New(ad.UpdatedAt),
-			DeletedAt:  timestamppb.New(*ad.DeleteAt),
+			DeletedAt:  deleteAt,
 			IsApproval: ad.IsApproval,
 			IsOpen:     ad.IsOpen,
 			AdLink:     ad.AdLink,

@@ -34,17 +34,6 @@ func (i *Infrastructure) DBCreateOrganization(ctx context.Context, organizationI
 		return nil, err
 	}
 
-	_, err = i.db.Database.CreateOrganizationUser(ctx,
-		sqlc.CreateOrganizationUserParams{
-			OrganizationID: organization.ID,
-			UserID:         organization.RepresentativeUserID,
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return organization, nil
 }
 
@@ -54,4 +43,17 @@ func (i *Infrastructure) TmpSaveRedisCreateOrganization(ctx context.Context, org
 		return nil, err
 	}
 	return organization, nil
+}
+
+func (i *Infrastructure) DBCreateOrganizationUser(ctx context.Context, organizationID, userID string) error {
+	_, err := i.db.Database.CreateOrganizationUser(ctx,
+		sqlc.CreateOrganizationUserParams{
+			OrganizationID: organizationID,
+			UserID:         userID,
+		},
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

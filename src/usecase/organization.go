@@ -32,6 +32,11 @@ func (r *Repository) CreateOrganization(ctx context.Context, organizationID, cli
 		return nil, err
 	}
 
+	err = r.organizationRepository.organizationRepository.DBCreateOrganizationUser(ctx, result.ID, result.RepresentativeUserID)
+	if err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 
