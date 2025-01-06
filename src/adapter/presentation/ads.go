@@ -23,6 +23,26 @@ func NewAdsServer(repository *usecase.Repository) *AdsServer {
 	}
 }
 
+func (s *AdsServer) GetCampaign(ctx context.Context, req *connect.Request[adsv1.GetCampaignRequest]) (*connect.Response[adsv1.GetCampaignResponse], error) {
+	campaign, err := s.usecase.GetCampaign(ctx, req.Msg.CampaignId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get campaign: %w", err)
+	}
+
+	res := connect.NewResponse(&adsv1.GetCampaignResponse{
+		Campaign: &adsv1.Campaign{
+			CampaignId: campaign.CampaignID,
+			UserId:     campaign.UserID,
+			Name:       campaign.Name,
+			Budget:     int32(campaign.Budget),
+			StartDate:  campaign.StartDate.Format("2006-01-02"),
+			EndDate:    campaign.EndDate.Format("2006-01-02"),
+			IsApproval: campaign.IsApproval,
+		},
+	})
+	return res, nil
+}
+
 func (s *AdsServer) ListCampaignByOrganizationID(ctx context.Context, req *connect.Request[adsv1.ListCampaignByOrganizationIDRequest]) (*connect.Response[adsv1.ListCampaignByOrganizationIDResponse], error) {
 	userID, ok := ctx.Value("uid").(string)
 	if !ok || userID == "" {

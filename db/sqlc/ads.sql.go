@@ -225,6 +225,28 @@ func (q *Queries) GetAdVideos(ctx context.Context) ([]GetAdVideosRow, error) {
 	return items, nil
 }
 
+const getCampaign = `-- name: GetCampaign :one
+SELECT campaign_id, user_id, name, budget, start_date, end_date, created_at, updated_at, deleted_at, is_approval FROM campaigns WHERE campaign_id = ? LIMIT 1
+`
+
+func (q *Queries) GetCampaign(ctx context.Context, campaignID string) (Campaign, error) {
+	row := q.db.QueryRowContext(ctx, getCampaign, campaignID)
+	var i Campaign
+	err := row.Scan(
+		&i.CampaignID,
+		&i.UserID,
+		&i.Name,
+		&i.Budget,
+		&i.StartDate,
+		&i.EndDate,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.IsApproval,
+	)
+	return i, err
+}
+
 const listAds = `-- name: ListAds :many
 SELECT ad_id, campaign_id, ad_type, created_at, updated_at, deleted_at, is_approval, is_open, ad_link FROM ads LIMIT ? OFFSET ?
 `

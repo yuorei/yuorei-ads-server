@@ -8,13 +8,14 @@ import (
 )
 
 type AdsInputPort interface {
-	GetAd(context.Context, string) (*domain.Ad, error)
+	GetCampaign(context.Context, string) (*domain.Campaign, error)
 	CheckOrganizationID(context.Context, string, string) error
 	ListCampaignByOrganizationID(context.Context, string, int, int) ([]*domain.Campaign, error)
 	CreateCampaign(context.Context, *domain.Campaign) (*domain.Campaign, error)
 	ListAdminAds(context.Context, string, int, int) ([]*domain.Ad, error)
 	ListAdsByCampaignID(context.Context, string, int, int) ([]*domain.Ad, error)
 
+	GetAd(context.Context, string) (*domain.Ad, error)
 	CreateAdVideo(context.Context, *domain.Ad, *domain.AdVideo, string, string, string, string) (*domain.Ad, error)
 	GetAdVideos(context.Context, *domain.GetAdVideoRequest) ([]*domain.AdVideoResponse, error)
 	WatchCountAdVideo(context.Context, *domain.WatchCountAdVideo) error
@@ -22,6 +23,7 @@ type AdsInputPort interface {
 }
 
 type AdsRepository interface {
+	DBGetCampaign(context.Context, string) (*domain.Campaign, error)
 	DBGetAd(context.Context, string) (*domain.Ad, error)
 	DBCheckOrganizationID(context.Context, string, string) error
 	DBListCampaignByOrganizationID(context.Context, string, int, int) ([]*domain.Campaign, error)

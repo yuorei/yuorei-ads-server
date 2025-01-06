@@ -18,6 +18,15 @@ func NewAdsRepository(adsRepository port.AdsRepository) *AdsUseCase {
 	}
 }
 
+func (r *Repository) GetCampaign(ctx context.Context, campaignID string) (*domain.Campaign, error) {
+	result, err := r.adsRepository.adsRepository.DBGetCampaign(ctx, campaignID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *Repository) CheckOrganizationID(ctx context.Context, organizationID, userID string) error {
 	err := r.adsRepository.adsRepository.DBCheckOrganizationID(ctx, organizationID, userID)
 	if err != nil {
