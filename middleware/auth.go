@@ -26,7 +26,7 @@ func (f *FirebaseApp) AuthMiddleware(next http.Handler) http.Handler {
 				ctx := context.WithValue(r.Context(), "Authorization", "ID token has expired")
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
-			} else if strings.Contains(err.Error(), "Error verifying ID token: ID token must be a non-empty string") {
+			} else if strings.Contains(err.Error(), "ID token must be a non-empty string") {
 				log.Println("ID token is not an ID token")
 				ctx := context.WithValue(r.Context(), "Authorization", "ID token is not an ID token")
 				next.ServeHTTP(w, r.WithContext(ctx))
